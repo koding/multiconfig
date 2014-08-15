@@ -18,10 +18,10 @@ Lets define and declare a struct
 
 ```go
 type Server struct {
-	Name        string 
-	Port          int
-	Enabled     bool
-	Rsers       []string 
+	Name    string
+	Port    int
+	Enabled bool
+	Users   []string
 }
 ```
 
@@ -38,7 +38,6 @@ serverConf := new(Server)
 
 err := m.Load(serverConf) // Check for error
 m.MustLoad(serverConf)    // Panic's if there is any error
-
 ```
 
 Run your app:
@@ -49,12 +48,11 @@ $ app
 
 # Override any config easily with environment variables, environment variables
 # are automatically generated in the form of STRUCTNAME_FIELDNAME
-$ SERVER_PORT=4000 app 
-
+$ SERVER_PORT=4000 SERVER_NAME="koding" app 
 
 # Or pass via flag. Flags are also automatically generated based on the field
 # name
-$ app -port 4000
+$ app -port 4000 -users "gopher,koding"
 ```
 
 ## TODO
