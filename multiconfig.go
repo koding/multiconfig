@@ -128,19 +128,37 @@ func (c *Config) LoadEnv(s interface{}) error {
 	return nil
 }
 
+func (c *Config) printEnvs(s interface{}) {
+	strct := structs.New(s)
+	strctName := strct.Name()
+
+	for _, field := range strct.Fields() {
+		envName := strings.ToUpper(strctName) + "_" + strings.ToUpper(field.Name())
+		fmt.Println("  ", envName)
+	}
+}
+
 // LoadFlag creates on the fly flags based on the field names and parses them to
 // load into the given pointer of struct s.
 func (c *Config) LoadFlag(s interface{}) error {
 	strct := structs.New(s)
 	structName := strct.Name()
 
-	f := flag.NewFlagSet(structName, flag.ContinueOnError)
+	f := flag.NewFlagSet(structName, flag.ExitOnError)
 	// f.SetOutput(ioutil.Discard)
 
 	for _, field := range strct.Fields() {
 		name := field.Name()
 
 		f.Var(newFieldValue(field), flagName(name), flagUsage(name))
+	}
+
+	f.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+		f.PrintDefaults()
+		fmt.Fprintf(os.Stderr, "\nGenerated environment variables:\n")
+		c.printEnvs(s)
+		fmt.Println("")
 	}
 
 	return f.Parse(os.Args[1:])

@@ -53,11 +53,22 @@ $ SERVER_PORT=4000 SERVER_NAME="koding" app
 # Or pass via flag. Flags are also automatically generated based on the field
 # name
 $ app -port 4000 -users "gopher,koding"
+
+# Print dynamically generated flags and environment variables:
+$ app -help
+Usage of app:
+  -enabled=true: Change value of Enabled.
+  -name=Koding: Change value of Name.
+  -port=6060: Change value of Port.
+  -users=[ankara istanbul]: Change value of Users.
+
+Generated environment variables:
+   SERVER_NAME
+   SERVER_PORT
+   SERVER_ENABLED
+   SERVER_USERS
 ```
 
-## TODO
-
-* Implement --help that automatically prints the environment variables and flags
 
 ## License
 
