@@ -14,7 +14,7 @@ go get github.com/koding/multiconfig
 
 ## Usage and Examples
 
-Lets define and declare a struct
+Lets define and struct that defines our configuration 
 
 ```go
 type Server struct {
@@ -25,17 +25,17 @@ type Server struct {
 }
 ```
 
-Load the configuration :
+Load the configuration into multiconfig:
 
 ```go
 // Create a new constructor without or with an initial config file
 m := multiconfig.New()
 m := multiconfig.NewWithPath("config.toml") // supports TOML and JSON
 
-
-// Populated the serverConf struct
+// Get an empty struct for your configuration
 serverConf := new(Server)
 
+// Populated the serverConf struct
 err := m.Load(serverConf) // Check for error
 m.MustLoad(serverConf)    // Panic's if there is any error
 ```

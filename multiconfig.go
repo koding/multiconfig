@@ -17,6 +17,10 @@ import (
 	"github.com/fatih/structs"
 )
 
+var (
+	errPathNotSet = errors.New("config path is not set")
+)
+
 // Config is used to handle multiple configuration sources
 type Config struct {
 	// Path contains the JSON or TOML file
@@ -47,46 +51,64 @@ func (c *Config) MustLoad(conf interface{}) {
 // multiple sources.
 func (c *Config) Load(conf interface{}) error {
 	if !structs.IsStruct(conf) {
-		return fmt.Errorf("Passed configuration is not a struct: %T", conf)
+		return fmt.Errorf("passed configuration is not a struct: %T", conf)
 	}
 
 	// Initialize struct from the config path.
-	if c.Path != "" {
-		if strings.HasSuffix(c.Path, "toml") {
-			if _, err := toml.DecodeFile(c.Path, conf); err != nil {
-				return err
-			}
+	if err := c.LoadFile(conf); err != nil {
+		// Means it its initialzed with New()
+		if err != errPathNotSet {
+			return err
 		}
-
-		if strings.HasSuffix(c.Path, "json") {
-			file, err := ioutil.ReadFile(c.Path)
-			if err != nil {
-				return err
-			}
-
-			if err := json.Unmarshal(file, conf); err != nil {
-				return err
-			}
-		}
-
 	}
 
 	// If any environment variable is available override it.
-	if err := c.Env(conf); err != nil {
+	if err := c.LoadEnv(conf); err != nil {
 		return err
 	}
 
 	// Finally check if any flag is defined, which overrides the field again
-	if err := c.Flag(conf); err != nil {
+	if err := c.LoadFlag(conf); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-// Env sets the fields of the given s struct by looking for environment
+// LoadFile sets the fields of the given s struct by reading from the given path.
+func (c *Config) LoadFile(s interface{}) error {
+	// Initialize struct from the config path.
+	if c.Path == "" {
+		return errPathNotSet
+	}
+
+	if strings.HasSuffix(c.Path, "toml") {
+		if _, err := toml.DecodeFile(c.Path, s); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	if strings.HasSuffix(c.Path, "json") {
+		file, err := ioutil.ReadFile(c.Path)
+		if err != nil {
+			return err
+		}
+
+		if err := json.Unmarshal(file, s); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	return fmt.Errorf("file format is not supported: %s. Want TOML or JSON.", c.Path)
+}
+
+// LoadEnv sets the fields of the given s struct by looking for environment
 // variables in the form of STRUCTNAME_FIELDNAME.
-func (c *Config) Env(s interface{}) error {
+func (c *Config) LoadEnv(s interface{}) error {
 	strct := structs.New(s)
 	strctName := strct.Name()
 
@@ -106,9 +128,9 @@ func (c *Config) Env(s interface{}) error {
 	return nil
 }
 
-// Flag creates on the fly flags based on the field names and parses them to
+// LoadFlag creates on the fly flags based on the field names and parses them to
 // load into the given pointer of struct s.
-func (c *Config) Flag(s interface{}) error {
+func (c *Config) LoadFlag(s interface{}) error {
 	strct := structs.New(s)
 	structName := strct.Name()
 
