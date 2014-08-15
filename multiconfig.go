@@ -47,8 +47,12 @@ func (c *Config) MustLoad(conf interface{}) {
 	}
 }
 
-// Load initializes the given pointer of struct s with configuration from
-// multiple sources.
+// Load initializes the given pointer of struct s with configuration from the
+// default sources. The order of load is LoadFile, LoadEnv and lastly LoadFlag.
+// An error in any step stops the loading process. Each step overrides the
+// previous step's config (i.e: defining a flag will override previous
+// environment or file config). To customize the order use the individual load
+// functions.
 func (c *Config) Load(conf interface{}) error {
 	if !structs.IsStruct(conf) {
 		return fmt.Errorf("passed configuration is not a struct: %T", conf)
