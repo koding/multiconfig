@@ -15,11 +15,7 @@ var (
 )
 
 func TestNewWithPath(t *testing.T) {
-	m := NewWithPath(testTOML)
-
-	if m.Path == "" {
-		t.Error("Path should be not empty")
-	}
+	var _ Loader = NewWithPath(testTOML)
 }
 
 func TestLoad(t *testing.T) {
