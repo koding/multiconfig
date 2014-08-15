@@ -28,22 +28,20 @@ type Server struct {
 Load the configuration :
 
 ```go
-serverConf := new(Server)
-
 // Create a new constructor without or with an initial config file
 m := multiconfig.New()
 m := multiconfig.NewWithPath("config.toml") // supports TOML and JSON
 
 
-// Now populated the serverConf struct
-err := m.Load(serverConf)
+// Populated the serverConf struct
+serverConf := new(Server)
 
-// Panic's if config cannot be loaded.
-m.MustLoad(serverConf) 
+err := m.Load(serverConf) // Check for error
+m.MustLoad(serverConf)    // Panic's if there is any error
 
 ```
 
-Now run your app:
+Run your app:
 
 ```sh
 # Loads from config.toml 
@@ -56,7 +54,7 @@ $ SERVER_PORT=4000 app
 
 # Or pass via flag. Flags are also automatically generated based on the field
 # name
-$ app  -port 4000
+$ app -port 4000
 ```
 
 ## TODO
