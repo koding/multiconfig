@@ -1,4 +1,4 @@
-Name              = "Koding"
+Name              = "koding"
 Port              = 6060
 Enabled           = true
 Users             = ["ankara", "istanbul"]

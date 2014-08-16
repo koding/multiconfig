@@ -31,6 +31,7 @@ func getDefaultServer() *Server {
 		Name:    "koding",
 		Port:    6060,
 		Enabled: true,
+		Users:   []string{"ankara", "istanbul"},
 		Postgres: Postgres{
 			Enabled:           true,
 			Port:              5432,
@@ -53,24 +54,10 @@ func TestLoad(t *testing.T) {
 		t.Error(err)
 	}
 
-	if s.Name != "Koding" {
-		t.Errorf("Name value is wrong: %s, want: %s", s.Name, "Koding")
-	}
-
-	if s.Port != 6060 {
-		t.Errorf("Port value is wrong: %s, want: %s", s.Port, 6060)
-	}
-
-	if !s.Enabled {
-		t.Errorf("Enabled value is wrong: %s, want: %s", s.Enabled, true)
-	}
-
-	if len(s.Users) != 2 {
-		t.Errorf("Users value is wrong: %s, want: %s", len(s.Users), 2)
-	}
+	testStruct(t, s, getDefaultServer())
 }
 
-func TestTomlEmbeddedStruct(t *testing.T) {
+func TestToml(t *testing.T) {
 	m := NewWithPath(testTOML)
 
 	s := &Server{}
@@ -78,10 +65,10 @@ func TestTomlEmbeddedStruct(t *testing.T) {
 		t.Error(err)
 	}
 
-	testEmbededStruct(t, s, getDefaultServer())
+	testStruct(t, s, getDefaultServer())
 }
 
-func TestJSONEmbeddedStruct(t *testing.T) {
+func TestJSON(t *testing.T) {
 	m := NewWithPath(testJSON)
 
 	s := &Server{}
@@ -89,7 +76,7 @@ func TestJSONEmbeddedStruct(t *testing.T) {
 		t.Error(err)
 	}
 
-	testEmbededStruct(t, s, getDefaultServer())
+	testStruct(t, s, getDefaultServer())
 }
 
 // func TestENVEmbeddedStruct(t *testing.T) {
@@ -105,10 +92,33 @@ func TestJSONEmbeddedStruct(t *testing.T) {
 // 		t.Error(err)
 // 	}
 
-// 	testEmbededStruct(t, s, getDefaultServer())
+// 	testStruct(t, s, getDefaultServer())
 // }
 
-func testEmbededStruct(t *testing.T, s *Server, d *Server) {
+func testStruct(t *testing.T, s *Server, d *Server) {
+
+	if s.Name != d.Name {
+		t.Errorf("Name value is wrong: %s, want: %s", s.Name, d.Name)
+	}
+
+	if s.Port != d.Port {
+		t.Errorf("Port value is wrong: %s, want: %s", s.Port, d.Port)
+	}
+
+	if s.Enabled != d.Enabled {
+		t.Errorf("Enabled value is wrong: %s, want: %s", s.Enabled, d.Enabled)
+	}
+
+	if len(s.Users) != len(d.Users) {
+		t.Errorf("Users value is wrong: %s, want: %s", len(s.Users), len(d.Users))
+	} else {
+		for i, user := range d.Users {
+			if s.Users[i] != user {
+				t.Errorf("User is wrong for index: %d, user: %s, want: %s", i, s.Users[i], user)
+			}
+		}
+	}
+
 	// Explicitly state that Enabled should be true, no need to check
 	// `x == true` infact.
 	if s.Postgres.Enabled != d.Postgres.Enabled {
