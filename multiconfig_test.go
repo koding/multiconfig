@@ -26,6 +26,21 @@ var (
 	testJSON = "testdata/config.json"
 )
 
+func getDefaultServer() *Server {
+	return &Server{
+		Name:    "koding",
+		Port:    6060,
+		Enabled: true,
+		Postgres: Postgres{
+			Enabled:           true,
+			Port:              5432,
+			Hosts:             []string{"192.168.2.1", "192.168.2.2", "192.168.2.3"},
+			DBName:            "configdb",
+			AvailabilityRatio: 8.23,
+		},
+	}
+}
+
 func TestNewWithPath(t *testing.T) {
 	var _ Loader = NewWithPath(testTOML)
 }
@@ -63,7 +78,7 @@ func TestTomlEmbeddedStruct(t *testing.T) {
 		t.Error(err)
 	}
 
-	testEmbededStruct(t, s)
+	testEmbededStruct(t, s, getDefaultServer())
 }
 
 func TestJSONEmbeddedStruct(t *testing.T) {
@@ -74,38 +89,36 @@ func TestJSONEmbeddedStruct(t *testing.T) {
 		t.Error(err)
 	}
 
-	testEmbededStruct(t, s)
+	testEmbededStruct(t, s, getDefaultServer())
 }
 
 func testEmbededStruct(t *testing.T, s *Server) {
+
+func testEmbededStruct(t *testing.T, s *Server, d *Server) {
 	// Explicitly state that Enabled should be true, no need to check
 	// `x == true` infact.
-	if s.Postgres.Enabled != true {
-		t.Error("Enabled should be true")
+	if s.Postgres.Enabled != d.Postgres.Enabled {
+		t.Error("Enabled is wrong %t, want: %t", s.Postgres.Enabled, d.Postgres.Enabled)
 	}
 
-	port := 5432
-	if s.Postgres.Port != port {
-		t.Errorf("Port value is wrong: %s, want: %s", s.Postgres.Port, port)
+	if s.Postgres.Port != d.Postgres.Port {
+		t.Errorf("Port value is wrong: %s, want: %s", s.Postgres.Port, d.Postgres.Port)
 	}
 
-	dbName := "configdb"
-	if s.Postgres.DBName != dbName {
-		t.Errorf("DBName is wrong: %s, want: %s", s.Postgres.DBName, dbName)
+	if s.Postgres.DBName != d.Postgres.DBName {
+		t.Errorf("DBName is wrong: %s, want: %s", s.Postgres.DBName, d.Postgres.DBName)
 	}
 
-	var availabilityRatio float64 = 8.23
-	if s.Postgres.AvailabilityRatio != availabilityRatio {
-		t.Errorf("AvailabilityRatio is wrong: %d, want: %d", s.Postgres.AvailabilityRatio, availabilityRatio)
+	if s.Postgres.AvailabilityRatio != d.Postgres.AvailabilityRatio {
+		t.Errorf("AvailabilityRatio is wrong: %d, want: %d", s.Postgres.AvailabilityRatio, d.Postgres.AvailabilityRatio)
 	}
 
-	hosts := []string{"192.168.2.1", "192.168.2.2", "192.168.2.3"}
-	if len(s.Postgres.Hosts) != 3 {
+	if len(s.Postgres.Hosts) != len(d.Postgres.Hosts) {
 		// do not continue testing if this fails, because others is depending on this test
-		t.Fatalf("Hosts len is wrong: %v, want: %v", s.Postgres.Hosts, hosts)
+		t.Fatalf("Hosts len is wrong: %v, want: %v", s.Postgres.Hosts, d.Postgres.Hosts)
 	}
 
-	for i, host := range hosts {
+	for i, host := range d.Postgres.Hosts {
 		if s.Postgres.Hosts[i] != host {
 			t.Fatalf("Hosts number %d is wrong: %v, want: %v", i, s.Postgres.Hosts[i], host)
 		}
