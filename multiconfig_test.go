@@ -92,7 +92,21 @@ func TestJSONEmbeddedStruct(t *testing.T) {
 	testEmbededStruct(t, s, getDefaultServer())
 }
 
-func testEmbededStruct(t *testing.T, s *Server) {
+// func TestENVEmbeddedStruct(t *testing.T) {
+// 	// KONFIG_SOCIALAPI_POSTGRES_HOST
+// 	// KONFIG_SOCIALAPI_POSTGRES_PORT
+// 	// KONFIG_SOCIALAPI_POSTGRES_USERNAME
+// 	// KONFIG_SOCIALAPI_POSTGRES_PASSWORD
+// 	// KONFIG_SOCIALAPI_POSTGRES_DBNAME
+// 	m := NewWithPath(testJSON)
+
+// 	s := &Server{}
+// 	if err := m.Load(s); err != nil {
+// 		t.Error(err)
+// 	}
+
+// 	testEmbededStruct(t, s, getDefaultServer())
+// }
 
 func testEmbededStruct(t *testing.T, s *Server, d *Server) {
 	// Explicitly state that Enabled should be true, no need to check
