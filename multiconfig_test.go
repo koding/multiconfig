@@ -63,6 +63,21 @@ func TestTomlEmbeddedStruct(t *testing.T) {
 		t.Error(err)
 	}
 
+	testEmbededStruct(t, s)
+}
+
+func TestJSONEmbeddedStruct(t *testing.T) {
+	m := NewWithPath(testJSON)
+
+	s := &Server{}
+	if err := m.Load(s); err != nil {
+		t.Error(err)
+	}
+
+	testEmbededStruct(t, s)
+}
+
+func testEmbededStruct(t *testing.T, s *Server) {
 	// Explicitly state that Enabled should be true, no need to check
 	// `x == true` infact.
 	if s.Postgres.Enabled != true {
