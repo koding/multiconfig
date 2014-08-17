@@ -19,7 +19,7 @@ func (e *EnvironmentLoader) Load(s interface{}) error {
 	strctName := strct.Name()
 
 	for _, field := range strct.Fields() {
-		if err := processField(strctName, field); err != nil {
+		if err := e.processField(strctName, field); err != nil {
 			return err
 		}
 	}
@@ -29,13 +29,13 @@ func (e *EnvironmentLoader) Load(s interface{}) error {
 
 // processField gets leading name for the env variable and combines the current
 // field's name and generates environemnt variable names recursively
-func processField(prefix string, field *structs.Field) error {
+func (e *EnvironmentLoader) processField(prefix string, field *structs.Field) error {
 	fieldName := strings.ToUpper(prefix) + "_" + strings.ToUpper(field.Name())
 
 	switch field.Kind() {
 	case reflect.Struct:
 		for _, f := range field.Fields() {
-			if err := processField(fieldName, f); err != nil {
+			if err := e.processField(fieldName, f); err != nil {
 				return err
 			}
 		}
