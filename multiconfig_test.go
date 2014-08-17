@@ -1,6 +1,9 @@
 package multiconfig
 
-import "testing"
+import (
+	"os"
+	"testing"
+)
 
 type (
 	Server struct {
@@ -79,21 +82,35 @@ func TestJSON(t *testing.T) {
 	testStruct(t, s, getDefaultServer())
 }
 
-// func TestENVEmbeddedStruct(t *testing.T) {
-// 	// KONFIG_SOCIALAPI_POSTGRES_HOST
-// 	// KONFIG_SOCIALAPI_POSTGRES_PORT
-// 	// KONFIG_SOCIALAPI_POSTGRES_USERNAME
-// 	// KONFIG_SOCIALAPI_POSTGRES_PASSWORD
-// 	// KONFIG_SOCIALAPI_POSTGRES_DBNAME
-// 	m := NewWithPath(testJSON)
+func TestENV(t *testing.T) {
+	env := map[string]string{
+		"SERVER_NAME":                       "koding",
+		"SERVER_PORT":                       "6060",
+		"SERVER_ENABLED":                    "true",
+		"SERVER_USERS":                      "ankara,istanbul",
+		"SERVER_POSTGRES_ENABLED":           "true",
+		"SERVER_POSTGRES_PORT":              "5432",
+		"SERVER_POSTGRES_HOSTS":             "192.168.2.1,192.168.2.2,192.168.2.3",
+		"SERVER_POSTGRES_DBNAME":            "configdb",
+		"SERVER_POSTGRES_AVAILABILITYRATIO": "8.23",
+		"SERVER_POSTGRES_FOO":               "8.23,9.12,11,90",
+	}
 
-// 	s := &Server{}
-// 	if err := m.Load(s); err != nil {
-// 		t.Error(err)
-// 	}
+	for key, val := range env {
+		if err := os.Setenv(key, val); err != nil {
+			t.Fatal(err)
+		}
+	}
 
-// 	testStruct(t, s, getDefaultServer())
-// }
+	m := New()
+
+	s := &Server{}
+	if err := m.Load(s); err != nil {
+		t.Error(err)
+	}
+
+	testStruct(t, s, getDefaultServer())
+}
 
 func testStruct(t *testing.T, s *Server, d *Server) {
 
@@ -102,15 +119,15 @@ func testStruct(t *testing.T, s *Server, d *Server) {
 	}
 
 	if s.Port != d.Port {
-		t.Errorf("Port value is wrong: %s, want: %s", s.Port, d.Port)
+		t.Errorf("Port value is wrong: %d, want: %d", s.Port, d.Port)
 	}
 
 	if s.Enabled != d.Enabled {
-		t.Errorf("Enabled value is wrong: %s, want: %s", s.Enabled, d.Enabled)
+		t.Errorf("Enabled value is wrong: %t, want: %t", s.Enabled, d.Enabled)
 	}
 
 	if len(s.Users) != len(d.Users) {
-		t.Errorf("Users value is wrong: %s, want: %s", len(s.Users), len(d.Users))
+		t.Errorf("Users value is wrong: %d, want: %d", len(s.Users), len(d.Users))
 	} else {
 		for i, user := range d.Users {
 			if s.Users[i] != user {
@@ -122,11 +139,11 @@ func testStruct(t *testing.T, s *Server, d *Server) {
 	// Explicitly state that Enabled should be true, no need to check
 	// `x == true` infact.
 	if s.Postgres.Enabled != d.Postgres.Enabled {
-		t.Error("Enabled is wrong %t, want: %t", s.Postgres.Enabled, d.Postgres.Enabled)
+		t.Errorf("Enabled is wrong %t, want: %t", s.Postgres.Enabled, d.Postgres.Enabled)
 	}
 
 	if s.Postgres.Port != d.Postgres.Port {
-		t.Errorf("Port value is wrong: %s, want: %s", s.Postgres.Port, d.Postgres.Port)
+		t.Errorf("Port value is wrong: %d, want: %d", s.Postgres.Port, d.Postgres.Port)
 	}
 
 	if s.Postgres.DBName != d.Postgres.DBName {
@@ -134,7 +151,7 @@ func testStruct(t *testing.T, s *Server, d *Server) {
 	}
 
 	if s.Postgres.AvailabilityRatio != d.Postgres.AvailabilityRatio {
-		t.Errorf("AvailabilityRatio is wrong: %d, want: %d", s.Postgres.AvailabilityRatio, d.Postgres.AvailabilityRatio)
+		t.Errorf("AvailabilityRatio is wrong: %f, want: %f", s.Postgres.AvailabilityRatio, d.Postgres.AvailabilityRatio)
 	}
 
 	if len(s.Postgres.Hosts) != len(d.Postgres.Hosts) {
