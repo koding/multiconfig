@@ -12,85 +12,89 @@ type S struct {
 
 func ExampleEnvironmentLoader() {
 	// Assume those values defined before running the Loader
-	os.Setenv("S_HOST", "golang.org")
-	os.Setenv("S_PORT", "80")
+	os.Setenv("S_HOST", "koding")
+	os.Setenv("S_PORT", "6060")
 
 	// Instantiate loader
 	l := &EnvironmentLoader{}
-	s := &S{}
+	s := &Server{}
 	err := l.Load(s)
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println("Here is our little config")
-	fmt.Println("Host-->", s.Host)
-	fmt.Println("Port-->", s.Host)
+	fmt.Println("Host-->", s.Name)
+	fmt.Println("Port-->", s.Port)
+
+	// Output:
+	// Here is our little config
+	// Host--> koding
+	// Port--> 6060
 }
 
 func ExampleTOMLLoader() {
-	const path = "/path/to/config.toml"
-
 	// Instantiate loader
-	l := &TOMLLoader{Path: path}
+	l := &TOMLLoader{Path: testTOML}
 
-	s := &S{}
+	s := &Server{}
 	err := l.Load(s)
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println("Here is our little config")
-	fmt.Println("Host-->", s.Host)
-	fmt.Println("Port-->", s.Host)
+	fmt.Println("Host-->", s.Name)
+	fmt.Println("Port-->", s.Port)
+
+	// Output:
+	// Here is our little config
+	// Host--> koding
+	// Port--> 6060
 }
 
 func ExampleJSONLoader() {
-	const path = "/path/to/config.json"
-
 	// Instantiate loader
-	l := &JSONLoader{Path: path}
+	l := &JSONLoader{Path: testJSON}
 
-	s := &S{}
+	s := &Server{}
 	err := l.Load(s)
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println("Here is our little config")
-	fmt.Println("Host-->", s.Host)
-	fmt.Println("Port-->", s.Host)
-}
+	fmt.Println("Host-->", s.Name)
+	fmt.Println("Port-->", s.Port)
 
-func ExampleFlagLoader() {
-	// Instantiate loader
-	l := &FlagLoader{}
-
-	s := &S{}
-	err := l.Load(s)
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("Here is our little config")
-	fmt.Println("Host-->", s.Host)
-	fmt.Println("Port-->", s.Host)
+	// Output:
+	// Here is our little config
+	// Host--> koding
+	// Port--> 6060
 }
 
 func ExampleMultiLoader() {
+	os.Setenv("S_HOST", "koding")
+	os.Setenv("S_PORT", "6060")
+
 	// Instantiate loaders
 	f := &FlagLoader{}
 	e := &EnvironmentLoader{}
 
 	l := MultiLoader(f, e)
 
-	s := &S{}
+	s := &Server{}
 	err := l.Load(s)
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println("Here is our little config")
-	fmt.Println("Host-->", s.Host)
-	fmt.Println("Port-->", s.Host)
+	fmt.Println("Host-->", s.Name)
+	fmt.Println("Port-->", s.Port)
+
+	// Output:
+	// Here is our little config
+	// Host--> koding
+	// Port--> 6060
 }
