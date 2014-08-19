@@ -44,3 +44,18 @@ func ExampleTOMLLoader() {
 	fmt.Println("Host-->", s.Host)
 	fmt.Println("Port-->", s.Host)
 }
+
+func ExampleFlagLoader() {
+	// Instantiate loader
+	l := &TOMLLoader{}
+
+	s := &S{}
+	err := l.Load(s)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Here is our little config")
+	fmt.Println("Host-->", s.Host)
+	fmt.Println("Port-->", s.Host)
+}
