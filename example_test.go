@@ -47,7 +47,25 @@ func ExampleTOMLLoader() {
 
 func ExampleFlagLoader() {
 	// Instantiate loader
-	l := &TOMLLoader{}
+	l := &FlagLoader{}
+
+	s := &S{}
+	err := l.Load(s)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Here is our little config")
+	fmt.Println("Host-->", s.Host)
+	fmt.Println("Port-->", s.Host)
+}
+
+func ExampleMultiLoader() {
+	// Instantiate loaders
+	f := &FlagLoader{}
+	e := &EnvironmentLoader{}
+
+	l := MultiLoader(f, e)
 
 	s := &S{}
 	err := l.Load(s)
