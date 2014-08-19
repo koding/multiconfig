@@ -29,10 +29,27 @@ func ExampleEnvironmentLoader() {
 }
 
 func ExampleTOMLLoader() {
-	const path = "/path/to/config"
+	const path = "/path/to/config.toml"
 
 	// Instantiate loader
 	l := &TOMLLoader{Path: path}
+
+	s := &S{}
+	err := l.Load(s)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Here is our little config")
+	fmt.Println("Host-->", s.Host)
+	fmt.Println("Port-->", s.Host)
+}
+
+func ExampleJSONLoader() {
+	const path = "/path/to/config.json"
+
+	// Instantiate loader
+	l := &JSONLoader{Path: path}
 
 	s := &S{}
 	err := l.Load(s)
