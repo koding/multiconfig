@@ -1,3 +1,5 @@
+// Package multiconfig provides a way to load and read configurations from
+// multiple sources
 package multiconfig
 
 import (
