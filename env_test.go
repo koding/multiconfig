@@ -72,5 +72,23 @@ func setEnvVars(t *testing.T, structName, prefix string) {
 			t.Fatal(err)
 		}
 	}
+}
 
+func TestENVgetPrefix(t *testing.T) {
+	e := &EnvironmentLoader{}
+	s := &Server{}
+
+	st := structs.New(s)
+
+	prefix := st.Name()
+
+	if p := e.getPrefix(st); p != prefix {
+		t.Errorf("Prefix is wrong: %s, want: %s", p, prefix)
+	}
+
+	e = &EnvironmentLoader{Prefix: "Test"}
+	prefix = "Test"
+	if p := e.getPrefix(st); p != prefix {
+		t.Errorf("Prefix is wrong: %s, want: %s", p, prefix)
+	}
 }
