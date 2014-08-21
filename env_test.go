@@ -86,8 +86,8 @@ func TestENVgetPrefix(t *testing.T) {
 		t.Errorf("Prefix is wrong: %s, want: %s", p, prefix)
 	}
 
-	e = &EnvironmentLoader{Prefix: "Test"}
 	prefix = "Test"
+	e = &EnvironmentLoader{Prefix: prefix}
 	if p := e.getPrefix(st); p != prefix {
 		t.Errorf("Prefix is wrong: %s, want: %s", p, prefix)
 	}
