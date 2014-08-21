@@ -21,6 +21,7 @@ type TOMLLoader struct {
 	Path string
 }
 
+// Load loads the source into the config defined by struct s
 func (t *TOMLLoader) Load(s interface{}) error {
 	filePath, err := getConfigPath(t.Path)
 	if err != nil {
