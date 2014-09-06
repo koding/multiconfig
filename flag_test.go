@@ -13,9 +13,26 @@ func TestFlag(t *testing.T) {
 	s := &Server{}
 	structName := structs.Name(s)
 
-	// set env variables
+	// get flags
 	args := getFlags(t, structName, "")
+	os.Args = args
 
+	if err := m.Load(s); err != nil {
+		t.Error(err)
+	}
+
+	testStruct(t, s, getDefaultServer())
+}
+
+func TestFlagWithPrefix(t *testing.T) {
+	const prefix = "Prefix"
+
+	m := FlagLoader{Prefix: prefix}
+	s := &Server{}
+	structName := structs.Name(s)
+
+	// get flags
+	args := getFlags(t, structName, prefix)
 	os.Args = args
 
 	if err := m.Load(s); err != nil {
