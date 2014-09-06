@@ -58,7 +58,6 @@ func TestLoad(t *testing.T) {
 }
 
 func testStruct(t *testing.T, s *Server, d *Server) {
-
 	if s.Name != d.Name {
 		t.Errorf("Name value is wrong: %s, want: %s", s.Name, d.Name)
 	}
@@ -84,7 +83,7 @@ func testStruct(t *testing.T, s *Server, d *Server) {
 	// Explicitly state that Enabled should be true, no need to check
 	// `x == true` infact.
 	if s.Postgres.Enabled != d.Postgres.Enabled {
-		t.Errorf("Enabled is wrong %t, want: %t", s.Postgres.Enabled, d.Postgres.Enabled)
+		t.Errorf("Postgres enabled is wrong %t, want: %t", s.Postgres.Enabled, d.Postgres.Enabled)
 	}
 
 	if s.Postgres.Port != d.Postgres.Port {

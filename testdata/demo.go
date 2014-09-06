@@ -36,6 +36,9 @@ func main() {
 	// Populated the serverConf struct
 	m.MustLoad(serverConf) // Check for error
 
+	fmt.Println("After Loading: ")
+	fmt.Printf("%+v\n", serverConf)
+
 	if serverConf.Enabled {
 		fmt.Println("Enabled field is set to true")
 	} else {
