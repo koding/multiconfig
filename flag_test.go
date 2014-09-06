@@ -1,7 +1,6 @@
 package multiconfig
 
 import (
-	"os"
 	"strings"
 	"testing"
 
@@ -15,7 +14,8 @@ func TestFlag(t *testing.T) {
 
 	// get flags
 	args := getFlags(t, structName, "")
-	os.Args = args
+
+	m.args = args[1:]
 
 	if err := m.Load(s); err != nil {
 		t.Error(err)
@@ -33,7 +33,8 @@ func TestFlagWithPrefix(t *testing.T) {
 
 	// get flags
 	args := getFlags(t, structName, prefix)
-	os.Args = args
+
+	m.args = args[1:]
 
 	if err := m.Load(s); err != nil {
 		t.Error(err)
