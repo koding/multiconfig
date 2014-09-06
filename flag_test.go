@@ -34,7 +34,7 @@ func getFlags(t *testing.T, structName, prefix string) []string {
 	flags := map[string]string{
 		"-name":                       "koding",
 		"-port":                       "6060",
-		"-enabled=true":               "",
+		"-enabled":                    "",
 		"-users":                      "ankara,istanbul",
 		"-postgres-enabled":           "",
 		"-postgres-port":              "5432",
