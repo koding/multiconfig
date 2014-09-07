@@ -19,10 +19,10 @@ type Loader interface {
 
 // DefaultLoader implements the Loader interface. It initializes the given
 // pointer of struct s with configuration from the default sources. The order
-// of load is FileLoader, EnvLoader and lastly FlagLoader. An error in any
-// step stops the loading process. Each step overrides the previous step's
-// config (i.e: defining a flag will override previous environment or file
-// config). To customize the order use the individual load functions.
+// of load is TagLoader, FileLoader, EnvLoader and lastly FlagLoader. An error
+// in any step stops the loading process. Each step overrides the previous
+// step's config (i.e: defining a flag will override previous environment or
+// file config). To customize the order use the individual load functions.
 type DefaultLoader struct {
 	Loader
 }
@@ -31,6 +31,8 @@ type DefaultLoader struct {
 // configuration file.
 func NewWithPath(path string) *DefaultLoader {
 	loaders := []Loader{}
+
+	loaders = append(loaders, &TagLoader{})
 
 	// Choose what while is passed
 	if strings.HasSuffix(path, "toml") {
@@ -55,6 +57,7 @@ func NewWithPath(path string) *DefaultLoader {
 // New returns a new instance of DefaultLoader without any file loaders.
 func New() *DefaultLoader {
 	loader := MultiLoader(
+		&TagLoader{},
 		&EnvironmentLoader{},
 		&FlagLoader{},
 	)

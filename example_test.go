@@ -42,7 +42,7 @@ func ExampleMultiLoader() {
 		Postgres Postgres
 	}
 
-	os.Setenv("SERVERCONFIG_HOST", "koding")
+	os.Setenv("SERVERCONFIG_NAME", "koding")
 	os.Setenv("SERVERCONFIG_PORT", "6060")
 
 	// Create a custom multi loader intance based on your needs.
