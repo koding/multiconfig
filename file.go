@@ -22,21 +22,10 @@ var (
 // the given toml file.
 type TOMLLoader struct {
 	Path string
-
-	// disableDefaults disables setting of default values. Useful for creating
-	// multi loaders.
-	disableDefaults bool
 }
 
 // Load loads the source into the config defined by struct s
 func (t *TOMLLoader) Load(s interface{}) error {
-	// get default values
-	if !t.disableDefaults {
-		if err := setDefaults(s); err != nil {
-			return err
-		}
-	}
-
 	filePath, err := getConfigPath(t.Path)
 	if err != nil {
 		return err
@@ -53,21 +42,10 @@ func (t *TOMLLoader) Load(s interface{}) error {
 // the given json file.
 type JSONLoader struct {
 	Path string
-
-	// disableDefaults disables setting of default values. Useful for creating
-	// multi loaders.
-	disableDefaults bool
 }
 
 // Load loads the source into the config defined by struct s
 func (j *JSONLoader) Load(s interface{}) error {
-	// get default values
-	if !j.disableDefaults {
-		if err := setDefaults(s); err != nil {
-			return err
-		}
-	}
-
 	filePath, err := getConfigPath(j.Path)
 	if err != nil {
 		return err

@@ -16,10 +16,6 @@ type EnvironmentLoader struct {
 	// Prefix prepends given string to every environment variable
 	// {STRUCTNAME}_FIELDNAME will be {PREFIX}_FIELDNAME
 	Prefix string
-
-	// disableDefaults disables setting of default values. Useful for creating
-	// multi loaders.
-	disableDefaults bool
 }
 
 func (e *EnvironmentLoader) getPrefix(s *structs.Struct) string {
@@ -32,13 +28,6 @@ func (e *EnvironmentLoader) getPrefix(s *structs.Struct) string {
 
 // Load loads the source into the config defined by struct s
 func (e *EnvironmentLoader) Load(s interface{}) error {
-	// get default values
-	if !e.disableDefaults {
-		if err := setDefaults(s); err != nil {
-			return err
-		}
-	}
-
 	strct := structs.New(s)
 
 	prefix := e.getPrefix(strct)

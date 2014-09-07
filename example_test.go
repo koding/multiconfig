@@ -19,7 +19,8 @@ func ExampleDefaultLoader() {
 
 	s := &ServerConfig{}
 
-	// Panic's if loading fails
+	// It first reads from config.toml, next from environment variables and
+	// finally from command line flags. Panic's if loading fails.
 	d.MustLoad(s)
 
 	fmt.Println("Host-->", s.Name)
@@ -29,6 +30,40 @@ func ExampleDefaultLoader() {
 	// Host--> koding
 	// Port--> 6060
 
+}
+
+func ExampleMultiLoader() {
+	// Our struct which is used for configuration
+	type ServerConfig struct {
+		Name     string
+		Port     int
+		Enabled  bool
+		Users    []string
+		Postgres Postgres
+	}
+
+	os.Setenv("SERVERCONFIG_HOST", "koding")
+	os.Setenv("SERVERCONFIG_PORT", "6060")
+
+	// Create a custom multi loader intance based on your needs.
+	f := &FlagLoader{}
+	e := &EnvironmentLoader{}
+
+	l := MultiLoader(f, e)
+
+	// Load configs into our s variable from the sources above
+	s := &ServerConfig{}
+	err := l.Load(s)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Host-->", s.Name)
+	fmt.Println("Port-->", s.Port)
+
+	// Output:
+	// Host--> koding
+	// Port--> 6060
 }
 
 func ExampleEnvironmentLoader() {
@@ -114,37 +149,4 @@ func ExampleJSONLoader() {
 	// Output:
 	// Host--> koding
 	// Users--> [ankara istanbul]
-}
-
-func ExampleMultiLoader() {
-	// Our struct which is used for configuration
-	type ServerConfig struct {
-		Name     string
-		Port     int
-		Enabled  bool
-		Users    []string
-		Postgres Postgres
-	}
-
-	os.Setenv("SERVERCONFIG_HOST", "koding")
-	os.Setenv("SERVERCONFIG_PORT", "6060")
-
-	// Create a multi loader intance based on your needs
-	f := &FlagLoader{}
-	e := &EnvironmentLoader{}
-	l := MultiLoader(f, e)
-
-	// Load configs into our s variable from the sources above
-	s := &ServerConfig{}
-	err := l.Load(s)
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("Host-->", s.Name)
-	fmt.Println("Port-->", s.Port)
-
-	// Output:
-	// Host--> koding
-	// Port--> 6060
 }

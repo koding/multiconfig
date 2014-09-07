@@ -10,16 +10,6 @@ import (
 	"github.com/fatih/structs"
 )
 
-var (
-	// DefaultDefaultTag is the default tag name for struct fields to define
-	// default values for a field. Example:
-	//
-	//   // Field's default value is "koding".
-	//   Name string `default:"koding"`
-	//
-	DefaultDefaultTag = "default"
-)
-
 // Loader loads the configuration from a source. The implementer of Loader is
 // responsible of setting the default values of the struct.
 type Loader interface {
@@ -29,10 +19,10 @@ type Loader interface {
 
 // DefaultLoader implements the Loader interface. It initializes the given
 // pointer of struct s with configuration from the default sources. The order
-// of load is LoadFile, LoadEnv and lastly LoadFlag.  An error in any step
-// stops the loading process. Each step overrides the previous step's config
-// (i.e: defining a flag will override previous environment or file config). To
-// customize the order use the individual load functions.
+// of load is FileLoader, EnvLoader and lastly FlagLoader. An error in any
+// step stops the loading process. Each step overrides the previous step's
+// config (i.e: defining a flag will override previous environment or file
+// config). To customize the order use the individual load functions.
 type DefaultLoader struct {
 	Loader
 }
@@ -44,15 +34,16 @@ func NewWithPath(path string) *DefaultLoader {
 
 	// Choose what while is passed
 	if strings.HasSuffix(path, "toml") {
-		loaders = append(loaders, &TOMLLoader{Path: path, disableDefaults: true})
+		loaders = append(loaders, &TOMLLoader{Path: path})
 	}
 
 	if strings.HasSuffix(path, "json") {
-		loaders = append(loaders, &JSONLoader{Path: path, disableDefaults: true})
+		loaders = append(loaders, &JSONLoader{Path: path})
 	}
 
-	f := &FlagLoader{disableDefaults: true}
-	e := &EnvironmentLoader{disableDefaults: true}
+	e := &EnvironmentLoader{}
+	f := &FlagLoader{}
+
 	loaders = append(loaders, e, f)
 	loader := MultiLoader(loaders...)
 
@@ -64,8 +55,8 @@ func NewWithPath(path string) *DefaultLoader {
 // New returns a new instance of DefaultLoader without any file loaders.
 func New() *DefaultLoader {
 	loader := MultiLoader(
-		&EnvironmentLoader{disableDefaults: true},
-		&FlagLoader{disableDefaults: true},
+		&EnvironmentLoader{},
+		&FlagLoader{},
 	)
 
 	d := &DefaultLoader{}
@@ -78,23 +69,6 @@ func (d *DefaultLoader) MustLoad(conf interface{}) {
 	if err := d.Load(conf); err != nil {
 		panic(err)
 	}
-}
-
-// setDefaults parses the struct and reads each field's tag
-func setDefaults(s interface{}) error {
-	for _, field := range structs.Fields(s) {
-		defaultVal := field.Tag(DefaultDefaultTag)
-		if defaultVal == "" {
-			continue
-		}
-
-		err := fieldSet(field, defaultVal)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 // fieldSet sets field value from the given string value. It converts the
