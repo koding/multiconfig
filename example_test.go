@@ -28,78 +28,97 @@ func ExampleEnvironmentLoader() {
 		panic(err)
 	}
 
-	fmt.Println("Here is our little config")
 	fmt.Println("Host-->", s.Name)
 	fmt.Println("Port-->", s.Port)
 
 	// Output:
-	// Here is our little config
 	// Host--> koding
 	// Port--> 6060
 }
 
 func ExampleTOMLLoader() {
+	// Our struct which is used for configuration
+	type ServerConfig struct {
+		Name     string
+		Port     int
+		Enabled  bool
+		Users    []string
+		Postgres Postgres
+	}
+
 	// Instantiate loader
 	l := &TOMLLoader{Path: testTOML}
 
-	s := &Server{}
+	s := &ServerConfig{}
 	err := l.Load(s)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("Here is our little config")
 	fmt.Println("Host-->", s.Name)
-	fmt.Println("Port-->", s.Port)
+	fmt.Println("Users-->", s.Users)
 
 	// Output:
-	// Here is our little config
 	// Host--> koding
-	// Port--> 6060
+	// Users--> [ankara istanbul]
 }
 
 func ExampleJSONLoader() {
+	// Our struct which is used for configuration
+	type ServerConfig struct {
+		Name     string
+		Port     int
+		Enabled  bool
+		Users    []string
+		Postgres Postgres
+	}
+
 	// Instantiate loader
 	l := &JSONLoader{Path: testJSON}
 
-	s := &Server{}
+	s := &ServerConfig{}
 	err := l.Load(s)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("Here is our little config")
 	fmt.Println("Host-->", s.Name)
-	fmt.Println("Port-->", s.Port)
+	fmt.Println("Users-->", s.Users)
 
 	// Output:
-	// Here is our little config
 	// Host--> koding
-	// Port--> 6060
+	// Users--> [ankara istanbul]
 }
 
 func ExampleMultiLoader() {
-	os.Setenv("S_HOST", "koding")
-	os.Setenv("S_PORT", "6060")
+	// Our struct which is used for configuration
+	type ServerConfig struct {
+		Name     string
+		Port     int
+		Enabled  bool
+		Users    []string
+		Postgres Postgres
+	}
 
-	// Instantiate loaders
+	os.Setenv("SERVERCONFIG_HOST", "koding")
+	os.Setenv("SERVERCONFIG_PORT", "6060")
+
+	// Create a multi loader intance based on your needs
 	f := &FlagLoader{}
 	e := &EnvironmentLoader{}
-
 	l := MultiLoader(f, e)
 
-	s := &Server{}
+	// Load configs into our s variable from the sources above
+	s := &ServerConfig{}
 	err := l.Load(s)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("Here is our little config")
 	fmt.Println("Host-->", s.Name)
 	fmt.Println("Port-->", s.Port)
 
 	// Output:
-	// Here is our little config
 	// Host--> koding
 	// Port--> 6060
 }
