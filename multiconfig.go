@@ -32,6 +32,7 @@ type DefaultLoader struct {
 func NewWithPath(path string) *DefaultLoader {
 	loaders := []Loader{}
 
+	// Read default values defined via tag fields "default"
 	loaders = append(loaders, &TagLoader{})
 
 	// Choose what while is passed
