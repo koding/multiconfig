@@ -11,6 +11,12 @@ import (
 )
 
 var (
+	// DefaultDefaultTag is the default tag name for struct fields to define
+	// default values for a field. Example:
+	//
+	//   // Field's default value is "koding".
+	//   Name string `default:"koding"`
+	//
 	DefaultDefaultTag = "default"
 )
 
