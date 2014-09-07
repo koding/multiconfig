@@ -5,19 +5,24 @@ import (
 	"os"
 )
 
-type S struct {
-	Host string
-	Port int
-}
-
 func ExampleEnvironmentLoader() {
+	// Our struct which is used for configuration
+	type ServerConfig struct {
+		Name     string
+		Port     int
+		Enabled  bool
+		Users    []string
+		Postgres Postgres
+	}
+
 	// Assume those values defined before running the Loader
-	os.Setenv("S_HOST", "koding")
-	os.Setenv("S_PORT", "6060")
+	os.Setenv("SERVERCONFIG_NAME", "koding")
+	os.Setenv("SERVERCONFIG_PORT", "6060")
 
 	// Instantiate loader
 	l := &EnvironmentLoader{}
-	s := &Server{}
+
+	s := &ServerConfig{}
 	err := l.Load(s)
 	if err != nil {
 		panic(err)
