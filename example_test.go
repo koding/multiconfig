@@ -19,8 +19,9 @@ func ExampleDefaultLoader() {
 
 	s := &ServerConfig{}
 
-	// It first reads from config.toml, next from environment variables and
-	// finally from command line flags. Panic's if loading fails.
+	// It first sets the default values for each field with tag values defined
+	// with "default", next it reads from config.toml, from environment
+	// variables and finally from command line flags. It panic's if loading fails.
 	d.MustLoad(s)
 
 	fmt.Println("Host-->", s.Name)
