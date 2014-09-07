@@ -10,7 +10,8 @@ import (
 	"github.com/fatih/structs"
 )
 
-// Loader loads the configuration from a source
+// Loader loads the configuration from a source. The implementer of Loader is
+// responsible of setting the default values of the struct.
 type Loader interface {
 	// Load loads the source into the config defined by struct s
 	Load(s interface{}) error
@@ -65,6 +66,23 @@ func (d *DefaultLoader) MustLoad(conf interface{}) {
 	if err := d.Load(conf); err != nil {
 		panic(err)
 	}
+}
+
+// setDefaults parses the struct and reads each field's tag
+func setDefaults(s interface{}) error {
+	for _, field := range structs.Fields(s) {
+		defaultVal := field.Tag("default")
+		if defaultVal == "" {
+			continue
+		}
+
+		err := fieldSet(field, defaultVal)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // fieldSet sets field value from the given string value. It converts the

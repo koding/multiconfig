@@ -26,6 +26,11 @@ type TOMLLoader struct {
 
 // Load loads the source into the config defined by struct s
 func (t *TOMLLoader) Load(s interface{}) error {
+	// get default values
+	if err := setDefaults(s); err != nil {
+		return err
+	}
+
 	filePath, err := getConfigPath(t.Path)
 	if err != nil {
 		return err
@@ -46,6 +51,11 @@ type JSONLoader struct {
 
 // Load loads the source into the config defined by struct s
 func (j *JSONLoader) Load(s interface{}) error {
+	// get default values
+	if err := setDefaults(s); err != nil {
+		return err
+	}
+
 	filePath, err := getConfigPath(j.Path)
 	if err != nil {
 		return err

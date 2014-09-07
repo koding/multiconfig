@@ -28,6 +28,11 @@ func (e *EnvironmentLoader) getPrefix(s *structs.Struct) string {
 
 // Load loads the source into the config defined by struct s
 func (e *EnvironmentLoader) Load(s interface{}) error {
+	// get default values
+	if err := setDefaults(s); err != nil {
+		return err
+	}
+
 	strct := structs.New(s)
 
 	prefix := e.getPrefix(strct)
