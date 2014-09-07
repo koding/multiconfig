@@ -57,6 +57,19 @@ func TestLoad(t *testing.T) {
 	testStruct(t, s, getDefaultServer())
 }
 
+func TestDefaultValues(t *testing.T) {
+	m := NewWithPath(testTOML)
+
+	s := new(Server)
+	if err := m.Load(s); err != nil {
+		t.Error(err)
+	}
+
+	if s.Port != getDefaultServer().Port {
+		t.Errorf("Port value is wrong: %d, want: %d", s.Port, getDefaultServer().Port)
+	}
+}
+
 func testStruct(t *testing.T, s *Server, d *Server) {
 	if s.Name != d.Name {
 		t.Errorf("Name value is wrong: %s, want: %s", s.Name, d.Name)
