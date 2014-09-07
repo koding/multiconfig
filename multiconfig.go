@@ -10,6 +10,10 @@ import (
 	"github.com/fatih/structs"
 )
 
+var (
+	DefaultDefaultTag = "default"
+)
+
 // Loader loads the configuration from a source. The implementer of Loader is
 // responsible of setting the default values of the struct.
 type Loader interface {
@@ -71,7 +75,7 @@ func (d *DefaultLoader) MustLoad(conf interface{}) {
 // setDefaults parses the struct and reads each field's tag
 func setDefaults(s interface{}) error {
 	for _, field := range structs.Fields(s) {
-		defaultVal := field.Tag("default")
+		defaultVal := field.Tag(DefaultDefaultTag)
 		if defaultVal == "" {
 			continue
 		}
