@@ -21,13 +21,19 @@ type FlagLoader struct {
 
 	// args defines a custom argument list that overides os.Args[]
 	args []string
+
+	// disableDefaults disables setting of default values. Useful for creating
+	// multi loaders.
+	disableDefaults bool
 }
 
 // Load loads the source into the config defined by struct s
 func (f *FlagLoader) Load(s interface{}) error {
 	// get default values
-	if err := setDefaults(s); err != nil {
-		return err
+	if !f.disableDefaults {
+		if err := setDefaults(s); err != nil {
+			return err
+		}
 	}
 
 	strct := structs.New(s)

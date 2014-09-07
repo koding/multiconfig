@@ -5,6 +5,32 @@ import (
 	"os"
 )
 
+func ExampleDefaultLoader() {
+	// Our struct which is used for configuration
+	type ServerConfig struct {
+		Name    string `default:"gopher"`
+		Port    int    `default:"6060"`
+		Enabled bool
+		Users   []string
+	}
+
+	// Instantiate a default loader.
+	d := NewWithPath("testdata/config.toml")
+
+	s := &ServerConfig{}
+
+	// Panic's if loading fails
+	d.MustLoad(s)
+
+	fmt.Println("Host-->", s.Name)
+	fmt.Println("Port-->", s.Port)
+
+	// Output:
+	// Host--> koding
+	// Port--> 6060
+
+}
+
 func ExampleEnvironmentLoader() {
 	// Our struct which is used for configuration
 	type ServerConfig struct {

@@ -44,14 +44,16 @@ func NewWithPath(path string) *DefaultLoader {
 
 	// Choose what while is passed
 	if strings.HasSuffix(path, "toml") {
-		loaders = append(loaders, &TOMLLoader{Path: path})
+		loaders = append(loaders, &TOMLLoader{Path: path, disableDefaults: true})
 	}
 
 	if strings.HasSuffix(path, "json") {
-		loaders = append(loaders, &JSONLoader{Path: path})
+		loaders = append(loaders, &JSONLoader{Path: path, disableDefaults: true})
 	}
 
-	loaders = append(loaders, &EnvironmentLoader{}, &FlagLoader{})
+	f := &FlagLoader{disableDefaults: true}
+	e := &EnvironmentLoader{disableDefaults: true}
+	loaders = append(loaders, e, f)
 	loader := MultiLoader(loaders...)
 
 	d := &DefaultLoader{}
@@ -62,8 +64,8 @@ func NewWithPath(path string) *DefaultLoader {
 // New returns a new instance of DefaultLoader without any file loaders.
 func New() *DefaultLoader {
 	loader := MultiLoader(
-		&EnvironmentLoader{},
-		&FlagLoader{},
+		&EnvironmentLoader{disableDefaults: true},
+		&FlagLoader{disableDefaults: true},
 	)
 
 	d := &DefaultLoader{}
