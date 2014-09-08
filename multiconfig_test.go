@@ -5,7 +5,7 @@ import "testing"
 type (
 	Server struct {
 		Name     string
-		Port     int
+		Port     int `default:"6060"`
 		Enabled  bool
 		Users    []string
 		Postgres Postgres
@@ -87,7 +87,7 @@ func testStruct(t *testing.T, s *Server, d *Server) {
 	}
 
 	if s.Postgres.Port != d.Postgres.Port {
-		t.Errorf("Port value is wrong: %d, want: %d", s.Postgres.Port, d.Postgres.Port)
+		t.Errorf("Postgres Port value is wrong: %d, want: %d", s.Postgres.Port, d.Postgres.Port)
 	}
 
 	if s.Postgres.DBName != d.Postgres.DBName {

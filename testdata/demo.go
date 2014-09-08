@@ -11,7 +11,7 @@ type (
 	// Server holds supported types by the multiconfig package
 	Server struct {
 		Name     string
-		Port     int
+		Port     int `default:"6060"`
 		Enabled  bool
 		Users    []string
 		Postgres Postgres
