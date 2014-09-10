@@ -16,7 +16,7 @@ type (
 		Enabled           bool
 		Port              int
 		Hosts             []string
-		DBName            string
+		DBName            string `default:"configdb"`
 		AvailabilityRatio float64
 	}
 )
