@@ -25,6 +25,7 @@ type Loader interface {
 // file config). To customize the order use the individual load functions.
 type DefaultLoader struct {
 	Loader
+	Validator
 }
 
 // NewWithPath returns a new instance of Loader to read from the given
@@ -52,6 +53,7 @@ func NewWithPath(path string) *DefaultLoader {
 
 	d := &DefaultLoader{}
 	d.Loader = loader
+	d.Validator = NewValidator()
 	return d
 }
 
@@ -65,6 +67,7 @@ func New() *DefaultLoader {
 
 	d := &DefaultLoader{}
 	d.Loader = loader
+	d.Validator = NewValidator()
 	return d
 }
 
