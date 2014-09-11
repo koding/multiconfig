@@ -76,6 +76,8 @@ func (d *DefaultLoader) MustLoad(conf interface{}) {
 	if err := d.Load(conf); err != nil {
 		panic(err)
 	}
+
+	d.MustValidate(conf)
 }
 
 // MustValidate validates the struct or panics
