@@ -2,6 +2,7 @@ package multiconfig
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/fatih/structs"
 )
@@ -24,6 +25,12 @@ func (d *DefaultValidator) Validate(s interface{}) error {
 		return nil
 	}
 
+	for _, validator := range d.Validators {
+		if err := validator.Validate(s); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -34,29 +41,50 @@ func NewValidator(validators ...Validator) *DefaultValidator {
 }
 
 type RequiredValidator struct {
-	RequiredTagName string
+	TagName  string
+	TagValue string
 }
 
+// Validate validates the given struct agaist field's zero values. By
+// If intentionaly, the value of a field is `zero-valued`(e.g false, 0, "")
+// required tag should not be set for that field.
 func (e *RequiredValidator) Validate(s interface{}) error {
-	if e.RequiredTagName == "" {
-		e.RequiredTagName = "required"
+	if e.TagName == "" {
+		e.TagName = "required"
 	}
 
-	requiredFields := []string{}
+	if e.TagValue == "" {
+		e.TagValue = "true"
+	}
+
 	for _, field := range structs.Fields(s) {
-		defaultVal := field.Tag(e.RequiredTagName)
-		if defaultVal == "" {
-			continue
+		if err := e.processField(field); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (e *RequiredValidator) processField(field *structs.Field) error {
+	switch field.Kind() {
+	case reflect.Struct:
+		for _, f := range field.Fields() {
+			if err := e.processField(f); err != nil {
+				return err
+			}
+		}
+	default:
+		val := field.Tag(e.TagName)
+		if val != e.TagValue {
+			return nil
 		}
 
 		if field.IsZero() {
-			requiredFields = append(requiredFields, field.Name())
+			// todo add parent struct names into error
+			return fmt.Errorf("field %s is required", field.Name())
 		}
 	}
 
-	if len(requiredFields) == 0 {
-		return nil
-	}
-
-	return fmt.Errorf("Field(s) [%v] are required", requiredFields)
+	return nil
 }

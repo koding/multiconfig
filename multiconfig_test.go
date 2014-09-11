@@ -4,8 +4,8 @@ import "testing"
 
 type (
 	Server struct {
-		Name     string
-		Port     int `default:"6060"`
+		Name     string `required:"true"`
+		Port     int    `default:"6060"`
 		Enabled  bool
 		Users    []string
 		Postgres Postgres
@@ -14,9 +14,9 @@ type (
 	// Postgres holds Postgresql database related configuration
 	Postgres struct {
 		Enabled           bool
-		Port              int
-		Hosts             []string
-		DBName            string `default:"configdb"`
+		Port              int      `required:"true" customRequired:"yes"`
+		Hosts             []string `required:"true"`
+		DBName            string   `default:"configdb"`
 		AvailabilityRatio float64
 	}
 )

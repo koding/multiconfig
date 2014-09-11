@@ -3,14 +3,43 @@ package multiconfig
 import "testing"
 
 func TestValidators(t *testing.T) {
-	m := NewWithPath(testTOML)
+	s := getDefaultServer()
+	s.Name = ""
 
-	s := new(Server)
-	if err := m.Load(s); err != nil {
-		t.Error(err)
+	err := (&RequiredValidator{}).Validate(s)
+	if err == nil {
+		t.Fatal("Name should be required")
+	}
+}
+
+func TestValidatorsEmbededStruct(t *testing.T) {
+	s := getDefaultServer()
+	s.Postgres.Port = 0
+
+	err := (&RequiredValidator{}).Validate(s)
+	if err == nil {
+		t.Fatal("Port should be required")
+	}
+}
+
+func TestValidatorsCustomTag(t *testing.T) {
+	s := getDefaultServer()
+
+	validator := (&RequiredValidator{
+		TagName:  "customRequired",
+		TagValue: "yes",
+	})
+
+	// test happy path
+	err := validator.Validate(s)
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	if s.Port != getDefaultServer().Port {
-		t.Errorf("Port value is wrong: %d, want: %d", s.Port, getDefaultServer().Port)
+	// validate sad case
+	s.Postgres.Port = 0
+	err = validator.Validate(s)
+	if err == nil {
+		t.Fatal("Port should be required")
 	}
 }
