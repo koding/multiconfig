@@ -60,8 +60,8 @@ type RequiredValidator struct {
 	TagValue string
 }
 
-// Validate validates the given struct agaist field's zero values. By
-// If intentionaly, the value of a field is `zero-valued`(e.g false, 0, "")
+// Validate validates the given struct agaist field's zero values. If
+// intentionaly, the value of a field is `zero-valued`(e.g false, 0, "")
 // required tag should not be set for that field.
 func (e *RequiredValidator) Validate(s interface{}) error {
 	if e.TagName == "" {
