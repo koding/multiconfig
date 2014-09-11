@@ -73,7 +73,7 @@ func (e *RequiredValidator) Validate(s interface{}) error {
 	}
 
 	for _, field := range structs.Fields(s) {
-		if err := e.processField(field); err != nil {
+		if err := e.processField("", field); err != nil {
 			return err
 		}
 	}
@@ -81,11 +81,14 @@ func (e *RequiredValidator) Validate(s interface{}) error {
 	return nil
 }
 
-func (e *RequiredValidator) processField(field *structs.Field) error {
+func (e *RequiredValidator) processField(fieldName string, field *structs.Field) error {
+	fieldName += field.Name()
 	switch field.Kind() {
 	case reflect.Struct:
+		fieldName += "."
+
 		for _, f := range field.Fields() {
-			if err := e.processField(f); err != nil {
+			if err := e.processField(fieldName, f); err != nil {
 				return err
 			}
 		}
@@ -96,8 +99,7 @@ func (e *RequiredValidator) processField(field *structs.Field) error {
 		}
 
 		if field.IsZero() {
-			// todo add parent struct names into error
-			return fmt.Errorf("field %s is required", field.Name())
+			return fmt.Errorf("field %s is required", fieldName)
 		}
 	}
 
