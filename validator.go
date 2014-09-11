@@ -37,6 +37,13 @@ func (d *DefaultValidator) Validate(s interface{}) error {
 	return nil
 }
 
+// MustValidate validates the struct, it panics if gets any error
+func (d *DefaultValidator) MustValidate(s interface{}) {
+	if err := d.Validate(s); err != nil {
+		panic(err)
+	}
+}
+
 // NewValidator accepts variadic validators and satisfies Validator interface.
 func NewValidator(validators ...Validator) *DefaultValidator {
 	return &DefaultValidator{

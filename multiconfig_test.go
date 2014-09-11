@@ -57,6 +57,25 @@ func TestLoad(t *testing.T) {
 	testStruct(t, s, getDefaultServer())
 }
 
+func TestDefaultLoader(t *testing.T) {
+	m := New()
+
+	s := new(Server)
+	if err := m.Load(s); err != nil {
+		t.Error(err)
+	}
+
+	if err := m.Validate(s); err != nil {
+		t.Error(err)
+	}
+	testStruct(t, s, getDefaultServer())
+
+	s.Name = ""
+	if err := m.Validate(s); err == nil {
+		t.Error("Name should be required")
+	}
+}
+
 func testStruct(t *testing.T, s *Server, d *Server) {
 	if s.Name != d.Name {
 		t.Errorf("Name value is wrong: %s, want: %s", s.Name, d.Name)

@@ -53,7 +53,7 @@ func NewWithPath(path string) *DefaultLoader {
 
 	d := &DefaultLoader{}
 	d.Loader = loader
-	d.Validator = NewValidator()
+	d.Validator = NewValidator(&RequiredValidator{})
 	return d
 }
 
@@ -67,13 +67,20 @@ func New() *DefaultLoader {
 
 	d := &DefaultLoader{}
 	d.Loader = loader
-	d.Validator = NewValidator()
+	d.Validator = NewValidator(&RequiredValidator{})
 	return d
 }
 
 // MustLoad is like Load but panics if the config cannot be parsed.
 func (d *DefaultLoader) MustLoad(conf interface{}) {
 	if err := d.Load(conf); err != nil {
+		panic(err)
+	}
+}
+
+// MustValidate validates the struct or panics
+func (d *DefaultLoader) MustValidate(conf interface{}) {
+	if err := d.Validate(conf); err != nil {
 		panic(err)
 	}
 }
