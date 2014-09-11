@@ -20,6 +20,9 @@ type DefaultValidator struct {
 	Validators []Validator
 }
 
+// Validate tries to validate given struct with all the validators. If it doesnt
+// have any Validator it will simply skip the validation step. If any of the
+// given validators return err, it will stop validating and return it.
 func (d *DefaultValidator) Validate(s interface{}) error {
 	if len(d.Validators) == 0 {
 		return nil
@@ -34,14 +37,19 @@ func (d *DefaultValidator) Validate(s interface{}) error {
 	return nil
 }
 
+// NewValidator accepts variadic validators and satisfies Validator interface.
 func NewValidator(validators ...Validator) *DefaultValidator {
 	return &DefaultValidator{
 		Validators: validators,
 	}
 }
 
+// RequiredValidator validates the struct against zero values
 type RequiredValidator struct {
-	TagName  string
+	//  TagName holds the validator tag name
+	TagName string
+
+	// TagValue holds the expected value of the validator
 	TagValue string
 }
 
