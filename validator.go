@@ -15,48 +15,12 @@ type Validator interface {
 	Validate(s interface{}) error
 }
 
-// DefaultValidator implements the Validator interface
-type DefaultValidator struct {
-	Validators []Validator
-}
-
-// Validate tries to validate given struct with all the validators. If it doesnt
-// have any Validator it will simply skip the validation step. If any of the
-// given validators return err, it will stop validating and return it.
-func (d *DefaultValidator) Validate(s interface{}) error {
-	if len(d.Validators) == 0 {
-		return nil
-	}
-
-	for _, validator := range d.Validators {
-		if err := validator.Validate(s); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// MustValidate validates the struct, it panics if gets any error
-func (d *DefaultValidator) MustValidate(s interface{}) {
-	if err := d.Validate(s); err != nil {
-		panic(err)
-	}
-}
-
-// NewValidator accepts variadic validators and satisfies Validator interface.
-func NewValidator(validators ...Validator) *DefaultValidator {
-	return &DefaultValidator{
-		Validators: validators,
-	}
-}
-
 // RequiredValidator validates the struct against zero values
 type RequiredValidator struct {
-	//  TagName holds the validator tag name
+	//  TagName holds the validator tag name. The default is "required"
 	TagName string
 
-	// TagValue holds the expected value of the validator
+	// TagValue holds the expected value of the validator. The default is "true"
 	TagValue string
 }
 
@@ -85,6 +49,8 @@ func (e *RequiredValidator) processField(fieldName string, field *structs.Field)
 	fieldName += field.Name()
 	switch field.Kind() {
 	case reflect.Struct:
+		// this is used for error messages below, when we have an error at the
+		// child properties add parent properties into the error message as well
 		fieldName += "."
 
 		for _, f := range field.Fields() {
