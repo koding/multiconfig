@@ -53,7 +53,7 @@ func NewWithPath(path string) *DefaultLoader {
 
 	d := &DefaultLoader{}
 	d.Loader = loader
-	d.Validator = NewValidator(&RequiredValidator{})
+	d.Validator = MultiValidator(&RequiredValidator{})
 	return d
 }
 
@@ -67,7 +67,7 @@ func New() *DefaultLoader {
 
 	d := &DefaultLoader{}
 	d.Loader = loader
-	d.Validator = NewValidator(&RequiredValidator{})
+	d.Validator = MultiValidator(&RequiredValidator{})
 	return d
 }
 
