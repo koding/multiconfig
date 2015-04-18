@@ -15,7 +15,7 @@ func TestFlag(t *testing.T) {
 	// get flags
 	args := getFlags(t, structName, "")
 
-	m.args = args[1:]
+	m.Args = args[1:]
 
 	if err := m.Load(s); err != nil {
 		t.Error(err)
@@ -34,7 +34,7 @@ func TestFlagWithPrefix(t *testing.T) {
 	// get flags
 	args := getFlags(t, structName, prefix)
 
-	m.args = args[1:]
+	m.Args = args[1:]
 
 	if err := m.Load(s); err != nil {
 		t.Error(err)
