@@ -79,7 +79,7 @@ func (f *FlagLoader) processField(flagSet *flag.FlagSet, fieldName string, field
 				// (by adding the fixme prefix)
 				alreadyDefined := false
 				flagSet.VisitAll(func(fl *flag.Flag) {
-					if flagName == fl.Name {
+					if strings.ToLower(ff.Name()) == fl.Name {
 						alreadyDefined = true
 					}
 				})
