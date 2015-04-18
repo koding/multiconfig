@@ -23,8 +23,8 @@ type FlagLoader struct {
 	// EnvLoader is used
 	EnvPrefix string
 
-	// args defines a custom argument list that overides os.Args[]
-	args []string
+	// Args defines a custom argument list. If nil, os.Args[1:] is used.
+	Args []string
 }
 
 // Load loads the source into the config defined by struct s
@@ -48,8 +48,8 @@ func (f *FlagLoader) Load(s interface{}) error {
 	}
 
 	args := os.Args[1:]
-	if f.args != nil {
-		args = f.args
+	if f.Args != nil {
+		args = f.Args
 	}
 
 	return flagSet.Parse(args)
