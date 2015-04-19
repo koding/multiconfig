@@ -75,19 +75,16 @@ func (f *FlagLoader) processField(flagSet *flag.FlagSet, fieldName string, field
 
 			if f.Flatten {
 				// first check if it's set or not, because if we have duplicate
-				// we don't want to break the flag. Just let the user fix it
-				// (by adding the fixme prefix)
-				alreadyDefined := false
+				// we don't want to break the flag. Panic by giving a readable
+				// output
 				flagSet.VisitAll(func(fl *flag.Flag) {
 					if strings.ToLower(ff.Name()) == fl.Name {
-						alreadyDefined = true
+						// already defined
+						panic(fmt.Sprintf("flag '%s' is already defined in outer struct", fl.Name))
 					}
 				})
 
 				flagName = ff.Name()
-				if alreadyDefined {
-					flagName = "fixme-" + ff.Name()
-				}
 			}
 
 			if err := f.processField(flagSet, flagName, ff); err != nil {

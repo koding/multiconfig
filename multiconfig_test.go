@@ -22,7 +22,6 @@ type (
 )
 
 type FlattenedServer struct {
-	Port     int // fixme flag case
 	Postgres Postgres
 }
 

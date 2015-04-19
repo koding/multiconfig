@@ -86,7 +86,6 @@ func getFlags(t *testing.T, structName, prefix string) []string {
 		flags = map[string]string{
 			"--enabled":           "",
 			"--port":              "5432",
-			"--fixme-port":        "5432",
 			"--hosts":             "192.168.2.1,192.168.2.2,192.168.2.3",
 			"--dbname":            "configdb",
 			"--availabilityratio": "8.23",
