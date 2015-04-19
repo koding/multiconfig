@@ -62,6 +62,25 @@ func TestFlattenFlags(t *testing.T) {
 	testFlattenedStruct(t, s, getDefaultServer())
 }
 
+func TestCamelcaseFlags(t *testing.T) {
+	m := FlagLoader{
+		CamelCase: true,
+	}
+	s := &CamelCaseServer{}
+	structName := structs.Name(s)
+
+	// get flags
+	args := getFlags(t, structName, "")
+
+	m.Args = args[1:]
+
+	if err := m.Load(s); err != nil {
+		t.Error(err)
+	}
+
+	testCamelcaseStruct(t, s, getDefaultCamelCaseServer())
+}
+
 // getFlags returns a slice of arguments that can be passed to flag.Parse()
 func getFlags(t *testing.T, structName, prefix string) []string {
 	if structName == "" {
@@ -89,6 +108,13 @@ func getFlags(t *testing.T, structName, prefix string) []string {
 			"--hosts":             "192.168.2.1,192.168.2.2,192.168.2.3",
 			"--dbname":            "configdb",
 			"--availabilityratio": "8.23",
+		}
+	case "CamelCaseServer":
+		flags = map[string]string{
+			"--access-key":         "123456",
+			"--normal":             "normal",
+			"--db-name":            "configdb",
+			"--availability-ratio": "8.23",
 		}
 	}
 
