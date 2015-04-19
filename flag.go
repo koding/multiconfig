@@ -22,10 +22,9 @@ type FlagLoader struct {
 	// Flatten doesn't add prefixes for nested structs. So previously if we had
 	// a nested struct `type T struct{Name struct{ ...}}`, this would generate
 	// --name-foo, --name-bar, etc. When Flatten is enabled, the flags will be
-	// flattend to the form: --foo, --bar, etc.. If the nested structs has a
-	// duplicate field name in the root level of the struct, it needs to be
-	// fixed and it will be displayed as --fixme-foo. Use this option only if
-	// you know what you do.
+	// flattend to the form: --foo, --bar, etc.. Panics if the nested structs
+	// has a duplicate field name in the root level of the struct (outer
+	// struct). Use this option only if you know what you do.
 	Flatten bool
 
 	// EnvPrefix is just a placeholder to print the correct usages when an
