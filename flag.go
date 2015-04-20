@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/fatih/camelcase"
 	"github.com/fatih/structs"
 )
 
@@ -26,6 +27,12 @@ type FlagLoader struct {
 	// has a duplicate field name in the root level of the struct (outer
 	// struct). Use this option only if you know what you do.
 	Flatten bool
+
+	// CamelCase adds a seperator for field names in camelcase form. A
+	// fieldname of "AccessKey" would generate a flag name "--accesskey". If
+	// CamelCase is enabled, the flag name will be generated in the form of
+	// "--access-key"
+	CamelCase bool
 
 	// EnvPrefix is just a placeholder to print the correct usages when an
 	// EnvLoader is used
@@ -50,7 +57,10 @@ func (f *FlagLoader) Load(s interface{}) error {
 		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
 		flagSet.PrintDefaults()
 		fmt.Fprintf(os.Stderr, "\nGenerated environment variables:\n")
-		e := &EnvironmentLoader{f.EnvPrefix}
+		e := &EnvironmentLoader{
+			Prefix:    f.EnvPrefix,
+			CamelCase: f.CamelCase,
+		}
 		e.PrintEnvs(s)
 		fmt.Println("")
 	}
@@ -67,6 +77,10 @@ func (f *FlagLoader) Load(s interface{}) error {
 // nested struct is detected, a flag for each field of that nested struct is
 // generated too.
 func (f *FlagLoader) processField(flagSet *flag.FlagSet, fieldName string, field *structs.Field) error {
+	if f.CamelCase {
+		fieldName = strings.Join(camelcase.Split(fieldName), "-")
+	}
+
 	switch field.Kind() {
 	case reflect.Struct:
 		for _, ff := range field.Fields() {

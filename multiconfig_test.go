@@ -25,6 +25,13 @@ type FlattenedServer struct {
 	Postgres Postgres
 }
 
+type CamelCaseServer struct {
+	AccessKey         string
+	Normal            string
+	DBName            string `default:"configdb"`
+	AvailabilityRatio float64
+}
+
 var (
 	testTOML = "testdata/config.toml"
 	testJSON = "testdata/config.json"
@@ -43,6 +50,15 @@ func getDefaultServer() *Server {
 			DBName:            "configdb",
 			AvailabilityRatio: 8.23,
 		},
+	}
+}
+
+func getDefaultCamelCaseServer() *CamelCaseServer {
+	return &CamelCaseServer{
+		AccessKey:         "123456",
+		Normal:            "normal",
+		DBName:            "configdb",
+		AvailabilityRatio: 8.23,
 	}
 }
 
@@ -162,4 +178,23 @@ func testFlattenedStruct(t *testing.T, s *FlattenedServer, d *Server) {
 			t.Fatalf("Hosts number %d is wrong: %v, want: %v", i, s.Postgres.Hosts[i], host)
 		}
 	}
+}
+
+func testCamelcaseStruct(t *testing.T, s *CamelCaseServer, d *CamelCaseServer) {
+	if s.AccessKey != d.AccessKey {
+		t.Errorf("AccessKey is wrong: %s, want: %s", s.AccessKey, d.AccessKey)
+	}
+
+	if s.Normal != d.Normal {
+		t.Errorf("Normal is wrong: %s, want: %s", s.Normal, d.Normal)
+	}
+
+	if s.DBName != d.DBName {
+		t.Errorf("DBName is wrong: %s, want: %s", s.DBName, d.DBName)
+	}
+
+	if s.AvailabilityRatio != d.AvailabilityRatio {
+		t.Errorf("AvailabilityRatio is wrong: %f, want: %f", s.AvailabilityRatio, d.AvailabilityRatio)
+	}
+
 }
