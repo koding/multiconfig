@@ -1,5 +1,5 @@
 Name              = "koding"
-Enabled           = false
+Enabled           = true
 Users             = ["ankara", "istanbul"]
 
 [Postgres]
