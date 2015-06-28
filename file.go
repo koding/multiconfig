@@ -92,10 +92,9 @@ func getConfig(path string) (*os.File, error) {
 		return os.Open(configPath)
 	}
 
-	// check if file is exists it self
-	if _, err := os.Stat(path); !os.IsNotExist(err) {
-		return os.Open(path)
+	f, err := os.Open(path)
+	if os.IsNotExist(err) {
+		return nil, ErrFileNotFound
 	}
-
-	return nil, ErrFileNotFound
+	return f, err
 }
