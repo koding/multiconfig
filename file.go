@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	// ErrPathNotSet states that given path to file loader is empty
-	ErrPathNotSet = errors.New("config path is not set")
+	// ErrSourceNotSet states that neither the path or the reader is set on the loader
+	ErrSourceNotSet = errors.New("config path or reader is not set")
 
 	// ErrFileNotFound states that given file is not exists
 	ErrFileNotFound = errors.New("config file not found")
@@ -30,16 +30,20 @@ type TOMLLoader struct {
 // file
 func (t *TOMLLoader) Load(s interface{}) error {
 	var r io.Reader
+
 	if t.Reader != nil {
 		r = t.Reader
-	} else {
+	} else if t.Path != "" {
 		file, err := getConfig(t.Path)
 		if err != nil {
 			return err
 		}
 		defer file.Close()
 		r = file
+	} else {
+		return ErrSourceNotSet
 	}
+
 	if _, err := toml.DecodeReader(r, s); err != nil {
 		return err
 	}
@@ -61,23 +65,21 @@ func (j *JSONLoader) Load(s interface{}) error {
 	var r io.Reader
 	if j.Reader != nil {
 		r = j.Reader
-	} else {
+	} else if j.Path != "" {
 		file, err := getConfig(j.Path)
 		if err != nil {
 			return err
 		}
 		defer file.Close()
 		r = file
+	} else {
+		return ErrSourceNotSet
 	}
 
 	return json.NewDecoder(r).Decode(s)
 }
 
 func getConfig(path string) (*os.File, error) {
-	if path == "" {
-		return nil, ErrPathNotSet
-	}
-
 	pwd, err := os.Getwd()
 	if err != nil {
 		return nil, err
