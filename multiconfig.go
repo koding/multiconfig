@@ -155,7 +155,7 @@ func fieldSet(field *structs.Field, v string) error {
 			return err
 		}
 	default:
-		return fmt.Errorf("multiconfig: not supported type: %s", field.Kind())
+		return fmt.Errorf("multiconfig: field '%s' has unsupported type: %s", field.Name(), field.Kind())
 	}
 
 	return nil
