@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/fatih/structs"
+	"github.com/ilgooz/structs"
 )
 
 func TestENV(t *testing.T) {

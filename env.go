@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/fatih/camelcase"
-	"github.com/fatih/structs"
+	"github.com/ilgooz/structs"
 )
 
 // EnvironmentLoader satisifies the loader interface. It loads the

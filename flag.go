@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/fatih/camelcase"
-	"github.com/fatih/structs"
+	"github.com/ilgooz/structs"
 )
 
 // FlagLoader satisfies the loader interface. It creates on the fly flags based

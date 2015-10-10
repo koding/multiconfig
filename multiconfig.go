@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fatih/structs"
+	"github.com/ilgooz/structs"
 )
 
 // Loader loads the configuration from a source. The implementer of Loader is

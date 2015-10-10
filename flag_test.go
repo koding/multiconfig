@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/fatih/structs"
+	"github.com/ilgooz/structs"
 )
 
 func TestFlag(t *testing.T) {

@@ -3,7 +3,7 @@ package multiconfig
 import (
 	"reflect"
 
-	"github.com/fatih/structs"
+	"github.com/ilgooz/structs"
 )
 
 // TagLoader satisfies the loader interface. It parses a struct's field tags
