@@ -81,8 +81,8 @@ func (f *FlagLoader) processField(flagSet *flag.FlagSet, fieldName string, field
 		fieldName = strings.Join(camelcase.Split(fieldName), "-")
 	}
 
-	switch field.Kind() {
-	case reflect.Struct:
+	switch {
+	case field.Kind() == reflect.Struct && !implementsTextUnmarshaler(field):
 		for _, ff := range field.Fields() {
 			flagName := field.Name() + "-" + ff.Name()
 
@@ -104,6 +104,9 @@ func (f *FlagLoader) processField(flagSet *flag.FlagSet, fieldName string, field
 				return err
 			}
 		}
+	case field.Kind() == reflect.Ptr:
+		field.InitElem()
+		return f.processField(flagSet, fieldName, field)
 	default:
 		// Add custom prefix to the flag if it's set
 		if f.Prefix != "" {
