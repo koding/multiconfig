@@ -133,7 +133,7 @@ func testStruct(t *testing.T, s *Server, d *Server) {
 	} else {
 		for i, label := range d.Labels {
 			if s.Labels[i] != label {
-				t.Errorf("Label is wrong for index: %d, label: %s, want: %s", i, s.Labels[i], label)
+				t.Errorf("Label is wrong for index: %d, label: %d, want: %d", i, s.Labels[i], label)
 			}
 		}
 	}
