@@ -42,8 +42,8 @@ type FlagLoader struct {
 	Args []string
 
 	// UsageFunc an optional function that is called to set a flag.Usage value
-	//  The input is the raw flag name, and the output should be a string
-	//  that will used in passed into the flag for Usage.
+	// The input is the raw flag name, and the output should be a string
+	// that will used in passed into the flag for Usage.
 	UsageFunc func(name string) string
 
 	// only exists for testing.  This is the raw flagset that is to parse
