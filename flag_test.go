@@ -104,7 +104,7 @@ func TestCustomUsageFunc(t *testing.T) {
 		Foobar string
 	}{}
 	m := FlagLoader{
-		UsageFunc: (func(s string) string { return usageMsg }),
+		FlagUsageFunc: (func(s string) string { return usageMsg }),
 	}
 	err := m.Load(&strt)
 

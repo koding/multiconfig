@@ -41,10 +41,10 @@ type FlagLoader struct {
 	// Args defines a custom argument list. If nil, os.Args[1:] is used.
 	Args []string
 
-	// UsageFunc an optional function that is called to set a flag.Usage value
+	// FlagUsageFunc an optional function that is called to set a flag.Usage value
 	// The input is the raw flag name, and the output should be a string
 	// that will used in passed into the flag for Usage.
-	UsageFunc func(name string) string
+	FlagUsageFunc func(name string) string
 
 	// only exists for testing.  This is the raw flagset that is to parse
 	flagSet *flag.FlagSet
@@ -122,11 +122,11 @@ func (f *FlagLoader) processField(flagSet *flag.FlagSet, fieldName string, field
 		// we only can get the value from expored fields, unexported fields panics
 		if field.IsExported() {
 			// use built-in or custom flag usage message
-			flagUsageFn := flagUsage
-			if f.UsageFunc != nil {
-				flagUsageFn = f.UsageFunc
+			flagUsageFunc := flagUsageDefault
+			if f.FlagUsageFunc != nil {
+				flagUsageFunc = f.FlagUsageFunc
 			}
-			flagSet.Var(newFieldValue(field), flagName(fieldName), flagUsageFn(fieldName))
+			flagSet.Var(newFieldValue(field), flagName(fieldName), flagUsageFunc(fieldName))
 		}
 	}
 
@@ -166,6 +166,8 @@ func (f *fieldValue) IsBoolFlag() bool {
 	return false
 }
 
-func flagUsage(name string) string { return fmt.Sprintf("Change value of %s.", name) }
+// flagUsageDefault is the default "FlagUsageFunc" use in filling out
+// the usage of a flag.
+func flagUsageDefault(name string) string { return fmt.Sprintf("Change value of %s.", name) }
 
 func flagName(name string) string { return strings.ToLower(name) }
