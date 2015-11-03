@@ -59,7 +59,7 @@ func (f *FlagLoader) Load(s interface{}) error {
 	f.flagSet = flagSet
 
 	for _, field := range strct.Fields() {
-		f.processField(flagSet, field.Name(), field)
+		f.processField(field.Name(), field)
 	}
 
 	flagSet.Usage = func() {
@@ -85,7 +85,7 @@ func (f *FlagLoader) Load(s interface{}) error {
 // processField generates a flag based on the given field and fieldName. If a
 // nested struct is detected, a flag for each field of that nested struct is
 // generated too.
-func (f *FlagLoader) processField(flagSet *flag.FlagSet, fieldName string, field *structs.Field) error {
+func (f *FlagLoader) processField(fieldName string, field *structs.Field) error {
 	if f.CamelCase {
 		fieldName = strings.Join(camelcase.Split(fieldName), "-")
 	}
@@ -99,7 +99,7 @@ func (f *FlagLoader) processField(flagSet *flag.FlagSet, fieldName string, field
 				// first check if it's set or not, because if we have duplicate
 				// we don't want to break the flag. Panic by giving a readable
 				// output
-				flagSet.VisitAll(func(fl *flag.Flag) {
+				f.flagSet.VisitAll(func(fl *flag.Flag) {
 					if strings.ToLower(ff.Name()) == fl.Name {
 						// already defined
 						panic(fmt.Sprintf("flag '%s' is already defined in outer struct", fl.Name))
@@ -109,7 +109,7 @@ func (f *FlagLoader) processField(flagSet *flag.FlagSet, fieldName string, field
 				flagName = ff.Name()
 			}
 
-			if err := f.processField(flagSet, flagName, ff); err != nil {
+			if err := f.processField(flagName, ff); err != nil {
 				return err
 			}
 		}
@@ -126,7 +126,7 @@ func (f *FlagLoader) processField(flagSet *flag.FlagSet, fieldName string, field
 			if f.FlagUsageFunc != nil {
 				flagUsageFunc = f.FlagUsageFunc
 			}
-			flagSet.Var(newFieldValue(field), flagName(fieldName), flagUsageFunc(fieldName))
+			f.flagSet.Var(newFieldValue(field), flagName(fieldName), flagUsageFunc(fieldName))
 		}
 	}
 
