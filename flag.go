@@ -40,6 +40,14 @@ type FlagLoader struct {
 
 	// Args defines a custom argument list. If nil, os.Args[1:] is used.
 	Args []string
+
+	// UsageFunc an optional function that is called to set a flag.Usage value
+	//  The input is the raw flag name, and the output should be a string
+	//  that will used in passed into the flag for Usage.
+	UsageFunc func(name string) string
+
+	// only exists for testing.  This is the raw flagset that is to parse
+	flagSet *flag.FlagSet
 }
 
 // Load loads the source into the config defined by struct s
@@ -48,6 +56,7 @@ func (f *FlagLoader) Load(s interface{}) error {
 	structName := strct.Name()
 
 	flagSet := flag.NewFlagSet(structName, flag.ExitOnError)
+	f.flagSet = flagSet
 
 	for _, field := range strct.Fields() {
 		f.processField(flagSet, field.Name(), field)
@@ -112,7 +121,12 @@ func (f *FlagLoader) processField(flagSet *flag.FlagSet, fieldName string, field
 
 		// we only can get the value from expored fields, unexported fields panics
 		if field.IsExported() {
-			flagSet.Var(newFieldValue(field), flagName(fieldName), flagUsage(fieldName))
+			// use built-in or custom flag usage message
+			flagUsageFn := flagUsage
+			if f.UsageFunc != nil {
+				flagUsageFn = f.UsageFunc
+			}
+			flagSet.Var(newFieldValue(field), flagName(fieldName), flagUsageFn(fieldName))
 		}
 	}
 
