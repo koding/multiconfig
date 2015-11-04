@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/fatih/camelcase"
-	"github.com/fatih/structs"
+	"github.com/ilgooz/structs"
 )
 
 // EnvironmentLoader satisifies the loader interface. It loads the
@@ -53,13 +53,16 @@ func (e *EnvironmentLoader) Load(s interface{}) error {
 func (e *EnvironmentLoader) processField(prefix string, field *structs.Field) error {
 	fieldName := e.generateFieldName(prefix, field)
 
-	switch field.Kind() {
-	case reflect.Struct:
+	switch {
+	case field.Kind() == reflect.Struct && !implementsTextUnmarshaler(field):
 		for _, f := range field.Fields() {
 			if err := e.processField(fieldName, f); err != nil {
 				return err
 			}
 		}
+	case field.Kind() == reflect.Ptr:
+		field.InitElem()
+		return e.processField(prefix, field)
 	default:
 		v := os.Getenv(fieldName)
 		if v == "" {

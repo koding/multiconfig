@@ -1,6 +1,7 @@
 package multiconfig
 
 import (
+	"encoding"
 	"fmt"
 	"os"
 	"reflect"
@@ -8,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fatih/structs"
+	"github.com/ilgooz/structs"
 )
 
 // Loader loads the configuration from a source. The implementer of Loader is
@@ -113,92 +114,109 @@ func (d *DefaultLoader) MustValidate(conf interface{}) {
 // fieldSet sets field value from the given string value. It converts the
 // string value in a sane way and is usefulf or environment variables or flags
 // which are by nature in string types.
-func fieldSet(field *structs.Field, v string) error {
-	// TODO: add support for other types
-	switch field.Kind() {
-	case reflect.Bool:
-		val, err := strconv.ParseBool(v)
-		if err != nil {
-			return err
+func fieldSet(field *structs.Field, s string) error {
+	if err := field.Settable(); err != nil {
+		return err
+	}
+
+	return setValue(field.ReflectValue(), s, field.Name())
+}
+
+func setValue(v reflect.Value, s, name string) error {
+	t := v.Type()
+	k := v.Kind()
+
+	switch k {
+	case reflect.Ptr:
+		if v.IsNil() {
+			v.Set(reflect.New(t.Elem()))
+		}
+		v = v.Elem()
+
+		return setValue(v, s, name)
+	case reflect.Struct:
+		if v.CanAddr() {
+			v = v.Addr()
 		}
 
-		if err := field.Set(val); err != nil {
-			return err
-		}
-	case reflect.Int:
-		i, err := strconv.Atoi(v)
-		if err != nil {
-			return err
+		if u, ok := v.Interface().(encoding.TextUnmarshaler); ok {
+			return u.UnmarshalText([]byte(s))
 		}
 
-		if err := field.Set(i); err != nil {
-			return err
-		}
-	case reflect.String:
-		if err := field.Set(v); err != nil {
-			return err
-		}
+		return fmt.Errorf("multiconfig: converter not found for %v", t)
 	case reflect.Slice:
-		switch t := field.Value().(type) {
-		case []string:
-			if err := field.Set(strings.Split(v, ",")); err != nil {
-				return err
-			}
-		case []int:
-			var list []int
-			for _, in := range strings.Split(v, ",") {
-				i, err := strconv.Atoi(in)
-				if err != nil {
-					return err
-				}
+		ss := strings.Split(s, ",")
 
-				list = append(list, i)
-			}
-
-			if err := field.Set(list); err != nil {
-				return err
-			}
-		default:
-			return fmt.Errorf("multiconfig: field '%s' of type slice is unsupported: %s (%T)",
-				field.Name(), field.Kind(), t)
+		if len(ss) == 0 {
+			return nil
 		}
-	case reflect.Float64:
-		f, err := strconv.ParseFloat(v, 64)
+
+		sc := reflect.MakeSlice(t, 0, 0)
+
+		for i, s := range ss {
+			e := reflect.Indirect(reflect.New(t.Elem()))
+			if err := setValue(e, s, name); err != nil {
+				return fmt.Errorf("multiconfig: field '%s' index '%d' conversion err: %s", name, i, err)
+			}
+			sc = reflect.Append(sc, e)
+		}
+
+		v.Set(sc)
+	case reflect.String:
+		v.SetString(s)
+	case reflect.Bool:
+		val, err := strconv.ParseBool(s)
 		if err != nil {
 			return err
 		}
 
-		if err := field.Set(f); err != nil {
+		v.SetBool(val)
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		var n int64
+
+		switch v.Interface().(type) {
+		case time.Duration:
+			d, err := time.ParseDuration(s)
+			if err != nil {
+				return err
+			}
+			n = int64(d)
+		default:
+			var err error
+			n, err = strconv.ParseInt(s, 10, t.Bits())
+			if err != nil {
+				return err
+			}
+		}
+
+		v.SetInt(n)
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		n, err := strconv.ParseUint(s, 10, t.Bits())
+		if err != nil {
 			return err
 		}
-	case reflect.Int64:
-		switch t := field.Value().(type) {
-		case time.Duration:
-			d, err := time.ParseDuration(v)
-			if err != nil {
-				return err
-			}
 
-			if err := field.Set(d); err != nil {
-				return err
-			}
-		case int64:
-			p, err := strconv.ParseInt(v, 10, 0)
-			if err != nil {
-				return err
-			}
-
-			if err := field.Set(p); err != nil {
-				return err
-			}
-		default:
-			return fmt.Errorf("multiconfig: field '%s' of type int64 is unsupported: %s (%T)",
-				field.Name(), field.Kind(), t)
+		v.SetUint(n)
+	case reflect.Float32, reflect.Float64:
+		n, err := strconv.ParseFloat(s, t.Bits())
+		if err != nil {
+			return err
 		}
 
+		v.SetFloat(n)
 	default:
-		return fmt.Errorf("multiconfig: field '%s' has unsupported type: %s", field.Name(), field.Kind())
+		return fmt.Errorf("multiconfig: field '%s' has unsupported type: %s", name, k)
 	}
 
 	return nil
+}
+
+var textUnmarshalerType = reflect.TypeOf((*encoding.TextUnmarshaler)(nil)).Elem()
+
+func implementsTextUnmarshaler(field *structs.Field) bool {
+	t := field.Type()
+	if t.Kind() == reflect.Ptr {
+		return t.Implements(textUnmarshalerType)
+	}
+	return reflect.PtrTo(t).Implements(textUnmarshalerType)
 }

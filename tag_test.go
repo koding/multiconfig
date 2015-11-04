@@ -9,11 +9,15 @@ func TestDefaultValues(t *testing.T) {
 		t.Error(err)
 	}
 
-	if s.Port != getDefaultServer().Port {
-		t.Errorf("Port value is wrong: %d, want: %d", s.Port, getDefaultServer().Port)
+	d := getDefaultServer()
+
+	if s.Port != d.Port {
+		t.Errorf("Port value is wrong: %d, want: %d", s.Port, d.Port)
 	}
 
-	if s.Postgres.DBName != getDefaultServer().Postgres.DBName {
-		t.Errorf("Postgres DBName value is wrong: %s, want: %s", s.Postgres.DBName, getDefaultServer().Postgres.DBName)
+	if s.Postgres.DBName != d.Postgres.DBName {
+		t.Errorf("Postgres DBName value is wrong: %s, want: %s", s.Postgres.DBName, d.Postgres.DBName)
 	}
+
+	testStruct2(t, s, d)
 }

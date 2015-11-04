@@ -3,7 +3,7 @@ package multiconfig
 import (
 	"reflect"
 
-	"github.com/fatih/structs"
+	"github.com/ilgooz/structs"
 )
 
 // TagLoader satisfies the loader interface. It parses a struct's field tags
@@ -37,13 +37,16 @@ func (t *TagLoader) Load(s interface{}) error {
 // processField gets tagName and the field, recursively checks if the field has the given
 // tag, if yes, sets it otherwise ignores
 func (t *TagLoader) processField(tagName string, field *structs.Field) error {
-	switch field.Kind() {
-	case reflect.Struct:
+	switch {
+	case field.Kind() == reflect.Struct && !implementsTextUnmarshaler(field):
 		for _, f := range field.Fields() {
 			if err := t.processField(tagName, f); err != nil {
 				return err
 			}
 		}
+	case field.Kind() == reflect.Ptr:
+		field.InitElem()
+		return t.processField(tagName, field)
 	default:
 		defaultVal := field.Tag(t.DefaultTagName)
 		if defaultVal == "" {

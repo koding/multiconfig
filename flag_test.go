@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/fatih/structs"
+	"github.com/ilgooz/structs"
 )
 
 func TestFlag(t *testing.T) {
@@ -142,6 +142,26 @@ func getFlags(t *testing.T, structName, prefix string) []string {
 			"-postgres-hosts":             "192.168.2.1,192.168.2.2,192.168.2.3",
 			"-postgres-dbname":            "configdb",
 			"-postgres-availabilityratio": "8.23",
+
+			"-f00":     "1",
+			"-f01":     "2",
+			"-f02":     "3",
+			"-f03":     "4",
+			"-f04":     "5",
+			"-f05":     "6",
+			"-f06":     "7.3",
+			"-f07":     "8",
+			"-f08":     "9",
+			"-f09":     "ankara",
+			"-f10":     "tr,en",
+			"-f11":     "6s",
+			"-f12":     "1ms,2m,3h",
+			"-f13":     "12",
+			"-f14":     "2015-11-05T08:15:30-05:00",
+			"-f15-f00": "turkey",
+			"-f15-f01": "10,20",
+			"-f16-f00": "turkey",
+			"-f16-f01": "10,20",
 		}
 	case "FlattenedServer":
 		flags = map[string]string{

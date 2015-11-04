@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/fatih/structs"
+	"github.com/ilgooz/structs"
 )
 
 func TestENV(t *testing.T) {
@@ -79,6 +79,26 @@ func setEnvVars(t *testing.T, structName, prefix string) {
 			"POSTGRES_DBNAME":            "configdb",
 			"POSTGRES_AVAILABILITYRATIO": "8.23",
 			"POSTGRES_FOO":               "8.23,9.12,11,90",
+
+			"F00":     "1",
+			"F01":     "2",
+			"F02":     "3",
+			"F03":     "4",
+			"F04":     "5",
+			"F05":     "6",
+			"F06":     "7.3",
+			"F07":     "8",
+			"F08":     "9",
+			"F09":     "ankara",
+			"F10":     "tr,en",
+			"F11":     "6s",
+			"F12":     "1ms,2m,3h",
+			"F13":     "12",
+			"F14":     "2015-11-05T08:15:30-05:00",
+			"F15_F00": "turkey",
+			"F15_F01": "10,20",
+			"F16_F00": "turkey",
+			"F16_F01": "10,20",
 		}
 	case "CamelCaseServer":
 		env = map[string]string{

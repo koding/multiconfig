@@ -1,6 +1,7 @@
 package multiconfig
 
 import (
+	"log"
 	"testing"
 	"time"
 )
@@ -16,6 +17,29 @@ type (
 		Postgres   Postgres
 		unexported string
 		Interval   time.Duration
+
+		F00 int               `default:"1"`
+		F01 int8              `default:"2"`
+		F02 int16             `default:"3"`
+		F03 int32             `default:"4"`
+		F04 int64             `default:"5"`
+		F05 uint32            `default:"6"`
+		F06 float32           `default:"7.3"`
+		F07 *int16            `default:"8"`
+		F08 *float64          `default:"9"`
+		F09 *string           `default:"ankara"`
+		F10 *[]string         `default:"tr,en"`
+		F11 *time.Duration    `default:"6s"`
+		F12 *[]*time.Duration `default:"1ms,2m,3h"`
+		F13 Int               `default:"12"`
+		F14 time.Time         `default:"2015-11-05T08:15:30-05:00"`
+		F15 CustomStruct
+		F16 *CustomStruct
+	}
+	Int          int
+	CustomStruct struct {
+		F00 string    `default:"turkey"`
+		F01 []*uint16 `default:"10,20"`
 	}
 
 	// Postgres holds Postgresql database related configuration
@@ -46,6 +70,17 @@ var (
 )
 
 func getDefaultServer() *Server {
+	f07, f08 := int16(8), float64(9)
+	f09, f10 := "ankara", []string{"tr", "en"}
+	f12 := 6 * time.Second
+	f12_0, f12_1, f12_2 := time.Millisecond, 2*time.Minute, 3*time.Hour
+	f15_f01_0, f15_f01_1 := uint16(10), uint16(20)
+
+	date := time.Time{}
+	if err := date.UnmarshalText([]byte("2015-11-05T08:15:30-05:00")); err != nil {
+		log.Fatalln(err)
+	}
+
 	return &Server{
 		Name:     "koding",
 		Port:     6060,
@@ -60,6 +95,30 @@ func getDefaultServer() *Server {
 			Hosts:             []string{"192.168.2.1", "192.168.2.2", "192.168.2.3"},
 			DBName:            "configdb",
 			AvailabilityRatio: 8.23,
+		},
+
+		F00: 1,
+		F01: int8(2),
+		F02: int16(3),
+		F03: int32(4),
+		F04: int64(5),
+		F05: uint32(6),
+		F06: float32(7.3),
+		F07: &f07,
+		F08: &f08,
+		F09: &f09,
+		F10: &f10,
+		F11: &f12,
+		F12: &[]*time.Duration{&f12_0, &f12_1, &f12_2},
+		F13: 12,
+		F14: date,
+		F15: CustomStruct{
+			F00: "turkey",
+			F01: []*uint16{&f15_f01_0, &f15_f01_1},
+		},
+		F16: &CustomStruct{
+			F00: "turkey",
+			F01: []*uint16{&f15_f01_0, &f15_f01_1},
 		},
 	}
 }
@@ -176,6 +235,95 @@ func testStruct(t *testing.T, s *Server, d *Server) {
 			t.Fatalf("Hosts number %d is wrong: %v, want: %v", i, s.Postgres.Hosts[i], host)
 		}
 	}
+
+	testStruct2(t, s, d)
+}
+
+func testStruct2(t *testing.T, s *Server, d *Server) {
+	if d.F00 != s.F00 {
+		t.Errorf("expected: %v, got: %v", d.F00, s.F00)
+	}
+
+	if d.F01 != s.F01 {
+		t.Errorf("expected: %v, got: %v", d.F01, s.F01)
+	}
+
+	if d.F02 != s.F02 {
+		t.Errorf("expected: %v, got: %v", d.F02, s.F02)
+	}
+
+	if d.F03 != s.F03 {
+		t.Errorf("expected: %v, got: %v", d.F03, s.F03)
+	}
+
+	if d.F04 != s.F04 {
+		t.Errorf("expected: %v, got: %v", d.F04, s.F04)
+	}
+
+	if d.F05 != s.F05 {
+		t.Errorf("expected: %v, got: %v", d.F05, s.F05)
+	}
+
+	if d.F06 != s.F06 {
+		t.Errorf("expected: %v, got: %v", d.F06, s.F06)
+	}
+
+	if *d.F07 != *s.F07 {
+		t.Errorf("expected: %v, got: %v", *d.F07, *s.F07)
+	}
+
+	if *d.F08 != *s.F08 {
+		t.Errorf("expected: %v, got: %v", *d.F08, *s.F08)
+	}
+
+	if *d.F09 != *s.F09 {
+		t.Errorf("expected: %v, got: %v", *d.F09, *s.F09)
+	}
+
+	if len(*d.F10) != len(*s.F10) || (*d.F10)[0] != (*s.F10)[0] || (*d.F10)[1] != (*s.F10)[1] {
+		t.Errorf("expected: %v, got: %v", *d.F10, *s.F10)
+	}
+
+	if *d.F11 != *s.F11 {
+		t.Errorf("expected: %v, got: %v", d.F11, s.F11)
+	}
+
+	if len(*d.F12) != len(*s.F12) || (*(*d.F12)[0]) != (*(*s.F12)[0]) ||
+		(*(*d.F12)[1]) != (*(*s.F12)[1]) || (*(*d.F12)[2]) != (*(*s.F12)[2]) {
+		t.Errorf("expected: %v, got: %v", d.F12, s.F12)
+	}
+
+	if d.F13 != s.F13 {
+		t.Errorf("expected: %v, got: %v", d.F13, s.F13)
+	}
+
+	if !d.F14.Equal(s.F14) {
+		t.Errorf("expected: %v, got: %v", d.F14, s.F14)
+	}
+
+	if d.F15.F00 != s.F15.F00 {
+		t.Errorf("expected: %v, got: %v", d.F15.F00, s.F15.F00)
+	}
+
+	if len(d.F15.F01) != len(s.F15.F01) {
+		t.Errorf("expected: %v, got: %v", len(d.F15.F01), len(s.F15.F01))
+	}
+
+	if *d.F15.F01[0] != *s.F15.F01[0] || *d.F15.F01[1] != *s.F15.F01[1] {
+		t.Errorf("expected: %v - %v, got: %v - %v", *d.F15.F01[0], *d.F15.F01[1], *s.F15.F01[0], *s.F15.F01[1])
+	}
+
+	if (*d.F16).F00 != (*s.F16).F00 {
+		t.Errorf("expected: %v, got: %v", d.F16.F00, s.F16.F00)
+	}
+
+	if len((*d.F16).F01) != len((*s.F16).F01) {
+		t.Errorf("expected: %v, got: %v", len((*d.F16).F01), len((*s.F16).F01))
+	}
+
+	if *(*d.F16).F01[0] != *(*s.F16).F01[0] || *(*d.F16).F01[1] != *(*s.F16).F01[1] {
+		t.Errorf("expected: %v - %v, got: %v - %v", *(*d.F16).F01[0], *(*d.F16).F01[1], *(*s.F16).F01[0], *(*s.F16).F01[1])
+	}
 }
 
 func testFlattenedStruct(t *testing.T, s *FlattenedServer, d *Server) {
@@ -226,4 +374,18 @@ func testCamelcaseStruct(t *testing.T, s *CamelCaseServer, d *CamelCaseServer) {
 		t.Errorf("AvailabilityRatio is wrong: %f, want: %f", s.AvailabilityRatio, d.AvailabilityRatio)
 	}
 
+}
+
+type InvalidSliceValueStruct struct {
+	F00 []time.Duration `default:"5s,5x"`
+}
+
+func TestInvalidSliceValue(t *testing.T) {
+	s := InvalidSliceValueStruct{}
+	if err := New().Load(&s); err.Error() != "multiconfig: field 'F00' index '1' conversion err: time: unknown unit x in duration 5x" {
+		t.Errorf("multiconfig: field 'F00' index '1' conversion err: time: unknown unit x in duration 5x, got: %s", err)
+	}
+	if nil != s.F00 {
+		t.Errorf("expected: %v, got: %v", nil, s.F00)
+	}
 }

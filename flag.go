@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/fatih/camelcase"
-	"github.com/fatih/structs"
+	"github.com/ilgooz/structs"
 )
 
 // FlagLoader satisfies the loader interface. It creates on the fly flags based
@@ -90,8 +90,8 @@ func (f *FlagLoader) processField(fieldName string, field *structs.Field) error 
 		fieldName = strings.Join(camelcase.Split(fieldName), "-")
 	}
 
-	switch field.Kind() {
-	case reflect.Struct:
+	switch {
+	case field.Kind() == reflect.Struct && !implementsTextUnmarshaler(field):
 		for _, ff := range field.Fields() {
 			flagName := field.Name() + "-" + ff.Name()
 
@@ -113,6 +113,9 @@ func (f *FlagLoader) processField(fieldName string, field *structs.Field) error 
 				return err
 			}
 		}
+	case field.Kind() == reflect.Ptr:
+		field.InitElem()
+		return f.processField(flagSet, fieldName, field)
 	default:
 		// Add custom prefix to the flag if it's set
 		if f.Prefix != "" {

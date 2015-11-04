@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/fatih/structs"
+	"github.com/ilgooz/structs"
 )
 
 // Validator validates the config against any predefined rules, those predefined
