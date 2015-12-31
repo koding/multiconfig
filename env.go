@@ -99,7 +99,7 @@ func (e *EnvironmentLoader) printField(prefix string, field *structs.Field) {
 	}
 }
 
-// generateFieldName generates the fiels name combined with the prefix and the
+// generateFieldName generates the field name combined with the prefix and the
 // struct's field name
 func (e *EnvironmentLoader) generateFieldName(prefix string, field *structs.Field) string {
 	fieldName := strings.ToUpper(field.Name())
