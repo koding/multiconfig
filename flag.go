@@ -28,7 +28,7 @@ type FlagLoader struct {
 	// struct). Use this option only if you know what you do.
 	Flatten bool
 
-	// CamelCase adds a seperator for field names in camelcase form. A
+	// CamelCase adds a separator for field names in camelcase form. A
 	// fieldname of "AccessKey" would generate a flag name "--accesskey". If
 	// CamelCase is enabled, the flag name will be generated in the form of
 	// "--access-key"
