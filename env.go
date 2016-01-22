@@ -18,7 +18,7 @@ type EnvironmentLoader struct {
 	// {STRUCTNAME}_FIELDNAME will be {PREFIX}_FIELDNAME
 	Prefix string
 
-	// CamelCase adds a seperator for field names in camelcase form. A
+	// CamelCase adds a separator for field names in camelcase form. A
 	// fieldname of "AccessKey" would generate a environment name of
 	// "STRUCTNAME_ACCESSKEY". If CamelCase is enabled, the environment name
 	// will be generated in the form of "STRUCTNAME_ACCESS_KEY"
