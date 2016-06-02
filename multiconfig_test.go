@@ -27,6 +27,11 @@ type (
 		AvailabilityRatio float64
 		unexported        string
 	}
+
+	TaggedServer struct {
+		Name     string `required:"true"`
+		Postgres `structs:",flatten"`
+	}
 )
 
 type FlattenedServer struct {
