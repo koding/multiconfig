@@ -51,7 +51,7 @@ func (e *EnvironmentLoader) Load(s interface{}) error {
 }
 
 // processField gets leading name for the env variable and combines the current
-// field's name and generates environemnt variable names recursively
+// field's name and generates environment variable names recursively
 func (e *EnvironmentLoader) processField(prefix string, field *structs.Field, name string, strctMap interface{}) error {
 	fieldName := e.generateFieldName(prefix, name)
 
