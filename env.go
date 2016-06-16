@@ -89,9 +89,9 @@ func (e *EnvironmentLoader) PrintEnvs(s interface{}) {
 		keys = append(keys, key)
 	}
 	sort.Strings(keys)
+
 	for _, key := range keys {
 		field := strct.Field(key)
-
 		e.printField(prefix, field, key, strctMap[key])
 	}
 }
@@ -102,10 +102,15 @@ func (e *EnvironmentLoader) printField(prefix string, field *structs.Field, name
 
 	switch strctMap.(type) {
 	case map[string]interface{}:
-		for key, val := range strctMap.(map[string]interface{}) {
+		smap := strctMap.(map[string]interface{})
+		keys := make([]string, 0, len(smap))
+		for key, _ := range smap {
+			keys = append(keys, key)
+		}
+		sort.Strings(keys)
+		for _, key := range keys {
 			field := field.Field(key)
-
-			e.printField(fieldName, field, key, val)
+			e.printField(fieldName, field, key, smap[key])
 		}
 	default:
 		fmt.Println("  ", fieldName)
