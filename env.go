@@ -3,6 +3,7 @@ package multiconfig
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/fatih/camelcase"
@@ -83,10 +84,15 @@ func (e *EnvironmentLoader) PrintEnvs(s interface{}) {
 	strctMap := strct.Map()
 	prefix := e.getPrefix(strct)
 
-	for key, val := range strctMap {
+	keys := make([]string, 0, len(strctMap))
+	for key, _ := range strctMap {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	for _, key := range keys {
 		field := strct.Field(key)
 
-		e.printField(prefix, field, key, val)
+		e.printField(prefix, field, key, strctMap[key])
 	}
 }
 
