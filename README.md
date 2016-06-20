@@ -88,4 +88,4 @@ Generated environment variables:
 
 ## License
 
-The MIT License (MIT) - see LICENSE.md for more details
+The MIT License (MIT) - see [LICENSE](/LICENSE) for more details

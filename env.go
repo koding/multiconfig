@@ -3,6 +3,7 @@ package multiconfig
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/fatih/camelcase"
@@ -50,7 +51,7 @@ func (e *EnvironmentLoader) Load(s interface{}) error {
 }
 
 // processField gets leading name for the env variable and combines the current
-// field's name and generates environemnt variable names recursively
+// field's name and generates environment variable names recursively
 func (e *EnvironmentLoader) processField(prefix string, field *structs.Field, name string, strctMap interface{}) error {
 	fieldName := e.generateFieldName(prefix, name)
 
@@ -83,10 +84,15 @@ func (e *EnvironmentLoader) PrintEnvs(s interface{}) {
 	strctMap := strct.Map()
 	prefix := e.getPrefix(strct)
 
-	for key, val := range strctMap {
-		field := strct.Field(key)
+	keys := make([]string, 0, len(strctMap))
+	for key, _ := range strctMap {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
 
-		e.printField(prefix, field, key, val)
+	for _, key := range keys {
+		field := strct.Field(key)
+		e.printField(prefix, field, key, strctMap[key])
 	}
 }
 
@@ -96,10 +102,15 @@ func (e *EnvironmentLoader) printField(prefix string, field *structs.Field, name
 
 	switch strctMap.(type) {
 	case map[string]interface{}:
-		for key, val := range strctMap.(map[string]interface{}) {
+		smap := strctMap.(map[string]interface{})
+		keys := make([]string, 0, len(smap))
+		for key, _ := range smap {
+			keys = append(keys, key)
+		}
+		sort.Strings(keys)
+		for _, key := range keys {
 			field := field.Field(key)
-
-			e.printField(fieldName, field, key, val)
+			e.printField(fieldName, field, key, smap[key])
 		}
 	default:
 		fmt.Println("  ", fieldName)
