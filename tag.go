@@ -34,6 +34,11 @@ func (t *TagLoader) Load(s interface{}) error {
 	return nil
 }
 
+// Help returns an empty string
+func (t *TagLoader) Help() string {
+	return ""
+}
+
 // processField gets tagName and the field, recursively checks if the field has the given
 // tag, if yes, sets it otherwise ignores
 func (t *TagLoader) processField(tagName string, field *structs.Field) error {

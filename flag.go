@@ -1,6 +1,7 @@
 package multiconfig
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"os"
@@ -50,29 +51,27 @@ type FlagLoader struct {
 	flagSet *flag.FlagSet
 }
 
+func (f *FlagLoader) Help() string {
+	out := new(bytes.Buffer)
+	f.flagSet.SetOutput(out)
+	f.flagSet.PrintDefaults()
+	return out.String()
+}
+
 // Load loads the source into the config defined by struct s
 func (f *FlagLoader) Load(s interface{}) error {
 	strct := structs.New(s)
 	structName := strct.Name()
 
-	flagSet := flag.NewFlagSet(structName, flag.ExitOnError)
+	flagSet := flag.NewFlagSet(structName, flag.ContinueOnError)
 	f.flagSet = flagSet
 
 	for _, field := range strct.Fields() {
 		f.processField(field.Name(), field)
 	}
 
-	flagSet.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-		flagSet.PrintDefaults()
-		fmt.Fprintf(os.Stderr, "\nGenerated environment variables:\n")
-		e := &EnvironmentLoader{
-			Prefix:    f.EnvPrefix,
-			CamelCase: f.CamelCase,
-		}
-		e.PrintEnvs(s)
-		fmt.Println("")
-	}
+	// need to prevent default printing of flag usage
+	flagSet.Usage = func() {}
 
 	args := os.Args[1:]
 	if f.Args != nil {

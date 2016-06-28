@@ -16,6 +16,7 @@ import (
 type Loader interface {
 	// Load loads the source into the config defined by struct s
 	Load(s interface{}) error
+	Help() string
 }
 
 // DefaultLoader implements the Loader interface. It initializes the given
