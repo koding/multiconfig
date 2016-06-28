@@ -12,6 +12,15 @@ import (
 	"github.com/fatih/structs"
 )
 
+// ErrorHandling defines how FlagLoader behaves if the parse fails.
+// Note that the values are slightly different than flag.ErrorHandling
+type ErrorHandling int
+
+const (
+	ExitOnError     ErrorHandling = iota // call os.Exit(2) if error
+	ContinueOnError                      // Allow caller to manual display help and exit
+)
+
 // FlagLoader satisfies the loader interface. It creates on the fly flags based
 // on the field names and parses them to load into the given pointer of struct
 // s.
@@ -47,6 +56,11 @@ type FlagLoader struct {
 	// that will used in passed into the flag for Usage.
 	FlagUsageFunc func(name string) string
 
+	// ErrorHandling matches flag.ErrorHandling value
+	//  By Default this is set to flag.ExitOnError for backwards compatibility.
+	//  Other values include flag.ContinueOnError and flag.PanicOnError
+	ErrorHandling ErrorHandling
+
 	// only exists for testing.  This is the raw flagset that is to parse
 	flagSet *flag.FlagSet
 }
@@ -63,22 +77,38 @@ func (f *FlagLoader) Load(s interface{}) error {
 	strct := structs.New(s)
 	structName := strct.Name()
 
-	flagSet := flag.NewFlagSet(structName, flag.ContinueOnError)
+	var flagSet *flag.FlagSet
+	switch f.ErrorHandling {
+	case ContinueOnError:
+		flagSet = flag.NewFlagSet(structName, flag.ContinueOnError)
+		// need to prevent default printing of flag usage
+		flagSet.Usage = func() {}
+	default:
+		flagSet = flag.NewFlagSet(structName, flag.ExitOnError)
+		flagSet.Usage = func() {
+			fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+			flagSet.PrintDefaults()
+			fmt.Fprintf(os.Stderr, "\nGenerated environment variables:\n")
+			e := &EnvironmentLoader{
+				Prefix:    f.EnvPrefix,
+				CamelCase: f.CamelCase,
+			}
+			e.PrintEnvs(s)
+			fmt.Println("")
+		}
+	}
 	f.flagSet = flagSet
 
 	for _, field := range strct.Fields() {
 		f.processField(field.Name(), field)
 	}
 
-	// need to prevent default printing of flag usage
-	flagSet.Usage = func() {}
-
 	args := os.Args[1:]
 	if f.Args != nil {
 		args = f.Args
 	}
 
-	return flagSet.Parse(args)
+	return f.flagSet.Parse(args)
 }
 
 // processField generates a flag based on the given field and fieldName. If a
