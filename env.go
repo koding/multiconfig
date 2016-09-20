@@ -1,6 +1,7 @@
 package multiconfig
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"sort"
@@ -23,6 +24,9 @@ type EnvironmentLoader struct {
 	// "STRUCTNAME_ACCESSKEY". If CamelCase is enabled, the environment name
 	// will be generated in the form of "STRUCTNAME_ACCESS_KEY"
 	CamelCase bool
+
+	// needed for help
+	dest interface{}
 }
 
 func (e *EnvironmentLoader) getPrefix(s *structs.Struct) string {
@@ -35,6 +39,8 @@ func (e *EnvironmentLoader) getPrefix(s *structs.Struct) string {
 
 // Load loads the source into the config defined by struct s
 func (e *EnvironmentLoader) Load(s interface{}) error {
+	e.dest = s
+
 	strct := structs.New(s)
 	strctMap := strct.Map()
 	prefix := e.getPrefix(strct)
@@ -48,6 +54,27 @@ func (e *EnvironmentLoader) Load(s interface{}) error {
 	}
 
 	return nil
+}
+
+func (e *EnvironmentLoader) Help() string {
+	out := new(bytes.Buffer)
+
+	strct := structs.New(e.dest)
+	strctMap := strct.Map()
+	prefix := e.getPrefix(strct)
+
+	keys := make([]string, 0, len(strctMap))
+	for key, _ := range strctMap {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	for _, key := range keys {
+		field := strct.Field(key)
+		e.printField(out, prefix, field, key, strctMap[key])
+	}
+
+	return out.String()
 }
 
 // processField gets leading name for the env variable and combines the current
@@ -80,24 +107,11 @@ func (e *EnvironmentLoader) processField(prefix string, field *structs.Field, na
 
 // PrintEnvs prints the generated environment variables to the std out.
 func (e *EnvironmentLoader) PrintEnvs(s interface{}) {
-	strct := structs.New(s)
-	strctMap := strct.Map()
-	prefix := e.getPrefix(strct)
-
-	keys := make([]string, 0, len(strctMap))
-	for key, _ := range strctMap {
-		keys = append(keys, key)
-	}
-	sort.Strings(keys)
-
-	for _, key := range keys {
-		field := strct.Field(key)
-		e.printField(prefix, field, key, strctMap[key])
-	}
+	fmt.Println(e.Help())
 }
 
 // printField prints the field of the config struct for the flag.Usage
-func (e *EnvironmentLoader) printField(prefix string, field *structs.Field, name string, strctMap interface{}) {
+func (e *EnvironmentLoader) printField(buf *bytes.Buffer, prefix string, field *structs.Field, name string, strctMap interface{}) {
 	fieldName := e.generateFieldName(prefix, name)
 
 	switch strctMap.(type) {
@@ -110,10 +124,10 @@ func (e *EnvironmentLoader) printField(prefix string, field *structs.Field, name
 		sort.Strings(keys)
 		for _, key := range keys {
 			field := field.Field(key)
-			e.printField(fieldName, field, key, smap[key])
+			e.printField(buf, fieldName, field, key, smap[key])
 		}
 	default:
-		fmt.Println("  ", fieldName)
+		buf.WriteString(fmt.Sprintf("  %s\n", fieldName))
 	}
 }
 

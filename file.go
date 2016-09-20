@@ -51,6 +51,11 @@ func (t *TOMLLoader) Load(s interface{}) error {
 	return nil
 }
 
+// Help returns an empty string
+func (t *TOMLLoader) Help() string {
+	return ""
+}
+
 // JSONLoader satisifies the loader interface. It loads the configuration from
 // the given json file or Reader
 type JSONLoader struct {
@@ -77,6 +82,11 @@ func (j *JSONLoader) Load(s interface{}) error {
 	}
 
 	return json.NewDecoder(r).Decode(s)
+}
+
+// Help returns an empty string
+func (j *JSONLoader) Help() string {
+	return ""
 }
 
 func getConfig(path string) (*os.File, error) {

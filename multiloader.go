@@ -19,6 +19,15 @@ func (m multiLoader) Load(s interface{}) error {
 	return nil
 }
 
+// Help will return the concatentated help messages of the loaders
+func (m multiLoader) Help() string {
+	out := ""
+	for _, loader := range m {
+		out += loader.Help()
+	}
+	return out
+}
+
 // MustLoad loads the source into the struct, it panics if gets any error
 func (m multiLoader) MustLoad(s interface{}) {
 	if err := m.Load(s); err != nil {
