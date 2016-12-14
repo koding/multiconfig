@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
 	"github.com/BurntSushi/toml"
+	"github.com/go-yaml/yaml"
 )
 
 var (
@@ -77,6 +79,51 @@ func (j *JSONLoader) Load(s interface{}) error {
 	}
 
 	return json.NewDecoder(r).Decode(s)
+}
+
+// YAMLLoader satisifies the loader interface. It loads the configuration from
+// the given yaml file
+type YAMLLoader struct {
+	Path   string
+	Reader io.Reader
+}
+
+// Load loads the source into the config defined by struct s
+// Defaults to using the Reader if provided, otherwise tries to read from the
+// file
+func (y *YAMLLoader) Load(s interface{}) error {
+	var data []byte
+	var err error
+
+	if y.Reader != nil {
+		data, err = ioutil.ReadAll(y.Reader)
+
+	} else if y.Path != "" {
+
+		var file *os.File
+
+		file, err = getConfig(y.Path)
+		if err != nil {
+			return err
+		}
+
+		data, err = ioutil.ReadAll(file)
+
+		file.Close()
+
+	} else {
+		return ErrSourceNotSet
+	}
+
+	if err != nil {
+		return err
+	}
+
+	if err = yaml.Unmarshal(data, s); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func getConfig(path string) (*os.File, error) {
