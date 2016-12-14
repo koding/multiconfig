@@ -47,6 +47,10 @@ func NewWithPath(path string) *DefaultLoader {
 		loaders = append(loaders, &JSONLoader{Path: path})
 	}
 
+	if strings.HasSuffix(path, "yml") || strings.HasSuffix(path, "yaml") {
+		loaders = append(loaders, &YAMLLoader{Path: path})
+	}
+
 	e := &EnvironmentLoader{}
 	f := &FlagLoader{}
 
