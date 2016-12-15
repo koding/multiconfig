@@ -92,38 +92,27 @@ type YAMLLoader struct {
 // Defaults to using the Reader if provided, otherwise tries to read from the
 // file
 func (y *YAMLLoader) Load(s interface{}) error {
-	var data []byte
-	var err error
+	var r io.Reader
 
 	if y.Reader != nil {
-		data, err = ioutil.ReadAll(y.Reader)
-
+		r = y.Reader
 	} else if y.Path != "" {
-
-		var file *os.File
-
-		file, err = getConfig(y.Path)
+		file, err := getConfig(y.Path)
 		if err != nil {
 			return err
 		}
-
-		data, err = ioutil.ReadAll(file)
-
-		file.Close()
-
+		defer file.Close()
+		r = file
 	} else {
 		return ErrSourceNotSet
 	}
 
+	data, err := ioutil.ReadAll(r)
 	if err != nil {
 		return err
 	}
 
-	if err = yaml.Unmarshal(data, s); err != nil {
-		return err
-	}
-
-	return nil
+	return yaml.Unmarshal(data, s)
 }
 
 func getConfig(path string) (*os.File, error) {
