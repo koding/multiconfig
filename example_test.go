@@ -151,3 +151,30 @@ func ExampleJSONLoader() {
 	// Host--> koding
 	// Users--> [ankara istanbul]
 }
+
+func ExampleYAMLLoader() {
+	// Our struct which is used for configuration
+	type ServerConfig struct {
+		Name     string
+		Port     int
+		Enabled  bool
+		Users    []string
+		Postgres Postgres
+	}
+
+	// Instantiate loader
+	l := &YAMLLoader{Path: testYAML}
+
+	s := &ServerConfig{}
+	err := l.Load(s)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Host-->", s.Name)
+	fmt.Println("Users-->", s.Users)
+
+	// Output:
+	// Host--> koding
+	// Users--> [ankara istanbul]
+}
