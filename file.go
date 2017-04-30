@@ -21,7 +21,7 @@ var (
 )
 
 // TOMLLoader satisifies the loader interface. It loads the configuration from
-// the given toml file or Reader
+// the given toml file or Reader.
 type TOMLLoader struct {
 	Path   string
 	Reader io.Reader
@@ -54,13 +54,13 @@ func (t *TOMLLoader) Load(s interface{}) error {
 }
 
 // JSONLoader satisifies the loader interface. It loads the configuration from
-// the given json file or Reader
+// the given json file or Reader.
 type JSONLoader struct {
 	Path   string
 	Reader io.Reader
 }
 
-// Load loads the source into the config defined by struct s
+// Load loads the source into the config defined by struct s.
 // Defaults to using the Reader if provided, otherwise tries to read from the
 // file
 func (j *JSONLoader) Load(s interface{}) error {
@@ -82,13 +82,13 @@ func (j *JSONLoader) Load(s interface{}) error {
 }
 
 // YAMLLoader satisifies the loader interface. It loads the configuration from
-// the given yaml file
+// the given yaml file.
 type YAMLLoader struct {
 	Path   string
 	Reader io.Reader
 }
 
-// Load loads the source into the config defined by struct s
+// Load loads the source into the config defined by struct s.
 // Defaults to using the Reader if provided, otherwise tries to read from the
 // file
 func (y *YAMLLoader) Load(s interface{}) error {
