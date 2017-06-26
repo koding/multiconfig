@@ -94,6 +94,7 @@ func (f *FlagLoader) Load(s interface{}) error {
 func (f *FlagLoader) processField(fieldName string, field *structs.Field) error {
 	if f.CamelCase {
 		fieldName = strings.Join(camelcase.Split(fieldName), "-")
+		fieldName = strings.Replace(fieldName, "---", "-", -1)
 	}
 
 	switch field.Kind() {
