@@ -2,18 +2,18 @@ package multiconfig
 
 import (
 	"flag"
-	"fmt"
-	"os"
 	"strings"
 )
 
+// Confer get flags' configuration file, if not blank, load this configuration file
+// after load in turn, then load flags again.
 type Confer interface {
 	GetConf() string
 }
 
-// MustLoadInTurn load configuration from tag/json/yml/yaml/toml/env/flag(from low to heigh) and validate.
-// If error, exit 2
-func MustLoadInTurn(app string, conf Confer) {
+// LoadInTurn load configuration from tag/json/yml/yaml/toml/env/flag(from low to heigh) and validate.
+// Configuration file in $PWD/conf/$app.{json,yml,yaml/toml}.
+func LoadInTurn(app string, conf Confer) error {
 	flagLoader := &FlagLoader{
 		Prefix:        "",
 		Flatten:       false,
@@ -47,14 +47,9 @@ func MustLoadInTurn(app string, conf Confer) {
 		loaders = append(loaders, &FlagLoader{})
 		loader := MultiLoader(loaders...)
 		if err := loader.Load(conf); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(2)
+			return err
 		}
 	}
 
-	rv := RequiredValidator{}
-	if err := rv.Validate(conf); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(2)
-	}
+	return (&RequiredValidator{}).Validate(conf)
 }
