@@ -11,6 +11,14 @@ type Confer interface {
 	GetConf() string
 }
 
+type Conf struct {
+	Conf     string `flagUsage:"conf file, it will override other conf file but not flags"`
+	Name     string `default:"aclogs" flagUsage:"server name"`
+	LogLevel string `default:"info" flagUsage:"log level, trace/debug/info/warn/error/fatal"`
+}
+
+func (c *Conf) GetConf() string { return c.Conf }
+
 // LoadInTurn load configuration from tag/json/yml/yaml/toml/env/flag(from low to heigh) and validate.
 // Configuration file in $PWD/conf/$app.{json,yml,yaml/toml}.
 func LoadInTurn(app string, conf Confer) error {
