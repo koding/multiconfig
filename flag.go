@@ -94,6 +94,7 @@ func (f *FlagLoader) Load(s interface{}) error {
 func (f *FlagLoader) processField(fieldName string, field *structs.Field) error {
 	if f.CamelCase {
 		fieldName = strings.Join(camelcase.Split(fieldName), "-")
+		fieldName = strings.Replace(fieldName, "---", "-", -1)
 	}
 
 	switch field.Kind() {
@@ -127,16 +128,24 @@ func (f *FlagLoader) processField(fieldName string, field *structs.Field) error 
 
 		// we only can get the value from expored fields, unexported fields panics
 		if field.IsExported() {
-			// use built-in or custom flag usage message
-			flagUsageFunc := flagUsageDefault
-			if f.FlagUsageFunc != nil {
-				flagUsageFunc = f.FlagUsageFunc
-			}
-			f.flagSet.Var(newFieldValue(field), flagName(fieldName), flagUsageFunc(fieldName))
+			f.flagSet.Var(newFieldValue(field), flagName(fieldName), f.flagUsage(fieldName, field))
 		}
 	}
 
 	return nil
+}
+
+func (f *FlagLoader) flagUsage(fieldName string, field *structs.Field) string {
+	if f.FlagUsageFunc != nil {
+		return f.FlagUsageFunc(fieldName)
+	}
+
+	usage := field.Tag("flagUsage")
+	if usage != "" {
+		return usage
+	}
+
+	return fmt.Sprintf("Change value of %s.", fieldName)
 }
 
 // fieldValue satisfies the flag.Value and flag.Getter interfaces
@@ -179,9 +188,5 @@ func (f *fieldValue) IsZero() bool {
 func (f *fieldValue) IsBoolFlag() bool {
 	return f.field.Kind() == reflect.Bool
 }
-
-// flagUsageDefault is the default "FlagUsageFunc" use in filling out
-// the usage of a flag.
-func flagUsageDefault(name string) string { return fmt.Sprintf("Change value of %s.", name) }
 
 func flagName(name string) string { return strings.ToLower(name) }
