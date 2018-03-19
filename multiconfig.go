@@ -63,6 +63,15 @@ func NewWithPath(path string) *DefaultLoader {
 	return d
 }
 
+// NewWithPathOptional returns a new instance of DefaultLoader with given file optinal.
+func NewWithPathOptional(path string) *DefaultLoader {
+	_, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return New()
+	}
+	return NewWithPath(path)
+}
+
 // New returns a new instance of DefaultLoader without any file loaders.
 func New() *DefaultLoader {
 	loader := MultiLoader(
