@@ -11,6 +11,9 @@
     "ankara",
     "istanbul"
   ],
+  "Log": {
+    "File": "/var/log/global.log"
+  },
   "Postgres": {
     "Enabled": true,
     "Port": 5432,
@@ -19,6 +22,9 @@
       "192.168.2.2",
       "192.168.2.3"
     ],
-    "AvailabilityRatio": 8.23
+    "AvailabilityRatio": 8.23,
+    "Log": {
+      "File": "/var/log/postgres.log"
+    }
   }
 }

@@ -65,7 +65,7 @@ func (f *FlagLoader) Load(s interface{}) error {
 	f.flagSet = flagSet
 
 	for _, field := range strct.Fields() {
-		f.processField(field.Name(), field)
+		f.processField(field.Name(), field, 0)
 	}
 
 	flagSet.Usage = func() {
@@ -92,7 +92,7 @@ func filterArgs(args []string) []string {
 	r := []string{}
 	for i := 0; i < len(args); i++ {
 		if strings.Index(args[i], "test.") >= 0 {
-			if i + 1 < len(args) && strings.Index(args[i + 1], "-") == -1 {
+			if i+1 < len(args) && strings.Index(args[i+1], "-") == -1 {
 				i++
 			}
 			i++
@@ -106,7 +106,7 @@ func filterArgs(args []string) []string {
 // processField generates a flag based on the given field and fieldName. If a
 // nested struct is detected, a flag for each field of that nested struct is
 // generated too.
-func (f *FlagLoader) processField(fieldName string, field *structs.Field) error {
+func (f *FlagLoader) processField(fieldName string, field *structs.Field, nestedLevel int) error {
 	if f.CamelCase {
 		fieldName = strings.Join(camelcase.Split(fieldName), "-")
 		fieldName = strings.Replace(fieldName, "---", "-", -1)
@@ -115,9 +115,9 @@ func (f *FlagLoader) processField(fieldName string, field *structs.Field) error 
 	switch field.Kind() {
 	case reflect.Struct:
 		for _, ff := range field.Fields() {
-			flagName := field.Name() + "-" + ff.Name()
+			flagName := fieldName + "-" + ff.Name()
 
-			if f.Flatten {
+			if f.Flatten && nestedLevel == 0 {
 				// first check if it's set or not, because if we have duplicate
 				// we don't want to break the flag. Panic by giving a readable
 				// output
@@ -131,7 +131,7 @@ func (f *FlagLoader) processField(fieldName string, field *structs.Field) error 
 				flagName = ff.Name()
 			}
 
-			if err := f.processField(flagName, ff); err != nil {
+			if err := f.processField(flagName, ff, nestedLevel+1); err != nil {
 				return err
 			}
 		}
