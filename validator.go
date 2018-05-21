@@ -58,6 +58,17 @@ func (e *RequiredValidator) processField(fieldName string, field *structs.Field)
 				return err
 			}
 		}
+	case reflect.Ptr:
+		if field.IsExported() && reflect.ValueOf(field.Value()).Elem().Kind() == reflect.Struct {
+			fieldName += "."
+			for _, f := range field.Fields() {
+				if err := e.processField(fieldName, f); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+		fallthrough
 	default:
 		val := field.Tag(e.TagName)
 		if val != e.TagValue {
