@@ -194,6 +194,15 @@ func fieldSet(field *structs.Field, v string) error {
 		if err := field.Set(f); err != nil {
 			return err
 		}
+	case reflect.Float32:
+		f, err := strconv.ParseFloat(v, 32)
+		if err != nil {
+			return err
+		}
+
+		if err := field.Set(float32(f)); err != nil {
+			return err
+		}
 	case reflect.Int64:
 		switch t := field.Value().(type) {
 		case time.Duration:
