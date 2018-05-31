@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/fatih/structs"
+	multierror "github.com/hashicorp/go-multierror"
 )
 
 // Validator validates the config against any predefined rules, those predefined
@@ -46,6 +47,7 @@ func (e *RequiredValidator) Validate(s interface{}) error {
 }
 
 func (e *RequiredValidator) processField(fieldName string, field *structs.Field) error {
+	var errs error
 	fieldName += field.Name()
 	switch field.Kind() {
 	case reflect.Struct:
@@ -55,7 +57,7 @@ func (e *RequiredValidator) processField(fieldName string, field *structs.Field)
 
 		for _, f := range field.Fields() {
 			if err := e.processField(fieldName, f); err != nil {
-				return err
+				errs = multierror.Append(errs, err)
 			}
 		}
 	default:
@@ -69,5 +71,5 @@ func (e *RequiredValidator) processField(fieldName string, field *structs.Field)
 		}
 	}
 
-	return nil
+	return errs
 }
