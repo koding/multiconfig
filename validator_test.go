@@ -1,6 +1,9 @@
 package multiconfig
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestValidators(t *testing.T) {
 	s := getDefaultServer()
@@ -43,8 +46,14 @@ func TestValidatorsCustomTag(t *testing.T) {
 		t.Fatal("Port should be required")
 	}
 
-	errStr := "multiconfig: field 'Postgres.Port' is required"
-	if err.Error() != errStr {
-		t.Fatalf("Err string is wrong: expected %s, got: %s", errStr, err.Error())
+	errStrPrefix := "1 error occurred:"
+	errStrSufix := "field 'Postgres.Port' is required"
+
+	if !strings.HasPrefix(err.Error(), errStrPrefix) {
+		t.Fatalf("Err string is wrong: expected prefix %s, got: %s", errStrPrefix, err.Error())
+	}
+
+	if !strings.HasSuffix(err.Error(), errStrSufix) {
+		t.Fatalf("Err string is wrong: expected suffix %s, got: %s", errStrSufix, err.Error())
 	}
 }
