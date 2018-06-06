@@ -52,9 +52,11 @@ func NewWithPath(path string) *DefaultLoader {
 	}
 
 	e := &EnvironmentLoader{}
-	f := &FlagLoader{}
+	// FlagLoader is unusable right now, refer to: https://github.com/koding/multiconfig/issues/75
+	// f := &FlagLoader{}
 
-	loaders = append(loaders, e, f)
+	// loaders = append(loaders, e, f)
+	loaders = append(loaders, e)
 	loader := MultiLoader(loaders...)
 
 	d := &DefaultLoader{}
