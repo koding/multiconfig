@@ -9,6 +9,7 @@ import (
 
 	"github.com/fatih/camelcase"
 	"github.com/fatih/structs"
+	"github.com/kballard/go-shellquote"
 )
 
 // FlagLoader satisfies the loader interface. It creates on the fly flags based
@@ -44,8 +45,11 @@ type FlagLoader struct {
 	// By default it's flag.ContinueOnError.
 	ErrorHandling flag.ErrorHandling
 
-	// Args defines a custom argument list. If nil, os.Args[1:] is used.
+	// Args defines a custom argument list. If nil and RawArgs is empty, os.Args[1:] is used.
 	Args []string
+
+	// RawArgs define a custom shell command line args, When not empty and Args is nil.
+	RawArgs string
 
 	// FlagUsageFunc an optional function that is called to set a flag.Usage value
 	// The input is the raw flag name, and the output should be a string
@@ -83,6 +87,12 @@ func (f *FlagLoader) Load(s interface{}) error {
 	args := filterArgs(os.Args[1:])
 	if f.Args != nil {
 		args = f.Args
+	} else if f.RawArgs != "" {
+		var err error
+		args, err = shellquote.Split(f.RawArgs)
+		if err != nil {
+			return err
+		}
 	}
 
 	return flagSet.Parse(args)
