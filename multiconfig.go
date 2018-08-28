@@ -181,6 +181,20 @@ func fieldSet(field *structs.Field, v string) error {
 			if err := field.Set(list); err != nil {
 				return err
 			}
+		case []float32:
+			var list []float32
+			for _, in := range strings.Split(v, ",") {
+				i, err := strconv.ParseFloat(in, 32)
+				if err != nil {
+					return err
+				}
+
+				list = append(list, float32(i))
+			}
+
+			if err := field.Set(list); err != nil {
+				return err
+			}
 		default:
 			return fmt.Errorf("multiconfig: field '%s' of type slice is unsupported: %s (%T)",
 				field.Name(), field.Kind(), t)
