@@ -201,11 +201,13 @@ func getFlags(t *testing.T, structName, prefix string) []string {
 			"-interval":                   "10s",
 			"-id":                         "1234567890",
 			"-labels":                     "123,456",
+			"-log-file":                   "/var/log/global.log",
 			"-postgres-enabled":           "",
 			"-postgres-port":              "5432",
 			"-postgres-hosts":             "192.168.2.1,192.168.2.2,192.168.2.3",
 			"-postgres-dbname":            "configdb",
 			"-postgres-availabilityratio": "8.23",
+			"-postgres-log-file":          "/var/log/postgres.log",
 		}
 	case "FlattenedServer":
 		flags = map[string]string{
@@ -214,6 +216,7 @@ func getFlags(t *testing.T, structName, prefix string) []string {
 			"--hosts":             "192.168.2.1,192.168.2.2,192.168.2.3",
 			"--dbname":            "configdb",
 			"--availabilityratio": "8.23",
+			"-log-file":           "/var/log/postgres.log",
 		}
 	case "FlattenedCamelCaseServer":
 		flags = map[string]string{

@@ -13,6 +13,7 @@ type (
 		Labels     []int
 		Enabled    bool
 		Users      []string
+		Log        Log
 		Postgres   Postgres
 		unexported string
 		Interval   time.Duration
@@ -25,12 +26,17 @@ type (
 		Hosts             []string `required:"true"`
 		DBName            string   `default:"configdb"`
 		AvailabilityRatio float64
+		Log               Log
 		unexported        string
 	}
 
 	TaggedServer struct {
 		Name     string `required:"true"`
 		Postgres `structs:",flatten"`
+	}
+
+	Log struct {
+		File string
 	}
 )
 
@@ -60,12 +66,14 @@ func getDefaultServer() *Server {
 		Labels:   []int{123, 456},
 		Users:    []string{"ankara", "istanbul"},
 		Interval: 10 * time.Second,
+		Log:      Log{File: "/var/log/global.log"},
 		Postgres: Postgres{
 			Enabled:           true,
 			Port:              5432,
 			Hosts:             []string{"192.168.2.1", "192.168.2.2", "192.168.2.3"},
 			DBName:            "configdb",
 			AvailabilityRatio: 8.23,
+			Log:               Log{File: "/var/log/postgres.log"},
 		},
 	}
 }
@@ -154,6 +162,10 @@ func testStruct(t *testing.T, s *Server, d *Server) {
 		}
 	}
 
+	if s.Log.File != d.Log.File {
+		t.Errorf("Log value is wrong: %s, want: %s", s.Log.File, d.Log.File)
+	}
+
 	testPostgres(t, s.Postgres, d.Postgres)
 }
 
@@ -178,6 +190,10 @@ func testPostgres(t *testing.T, s Postgres, d Postgres) {
 
 	if s.AvailabilityRatio != d.AvailabilityRatio {
 		t.Errorf("AvailabilityRatio is wrong: %f, want: %f", s.AvailabilityRatio, d.AvailabilityRatio)
+	}
+
+	if s.Log.File != d.Log.File {
+		t.Errorf("Postgres Log value is wrong: %s, want: %s", s.Log.File, d.Log.File)
 	}
 
 	if len(s.Hosts) != len(d.Hosts) {

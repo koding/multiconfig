@@ -9,6 +9,7 @@ import (
 
 	"github.com/fatih/camelcase"
 	"github.com/fatih/structs"
+	"github.com/kballard/go-shellquote"
 )
 
 // FlagLoader satisfies the loader interface. It creates on the fly flags based
@@ -44,8 +45,11 @@ type FlagLoader struct {
 	// By default it's flag.ContinueOnError.
 	ErrorHandling flag.ErrorHandling
 
-	// Args defines a custom argument list. If nil, os.Args[1:] is used.
+	// Args defines a custom argument list. If nil and RawArgs is empty, os.Args[1:] is used.
 	Args []string
+
+	// RawArgs define a custom shell command line args, When not empty and Args is nil.
+	RawArgs string
 
 	// FlagUsageFunc an optional function that is called to set a flag.Usage value
 	// The input is the raw flag name, and the output should be a string
@@ -65,7 +69,7 @@ func (f *FlagLoader) Load(s interface{}) error {
 	f.flagSet = flagSet
 
 	for _, field := range strct.Fields() {
-		f.processField(field.Name(), field)
+		f.processField(field.Name(), field, 0)
 	}
 
 	flagSet.Usage = func() {
@@ -83,6 +87,12 @@ func (f *FlagLoader) Load(s interface{}) error {
 	args := filterArgs(os.Args[1:])
 	if f.Args != nil {
 		args = f.Args
+	} else if f.RawArgs != "" {
+		var err error
+		args, err = shellquote.Split(f.RawArgs)
+		if err != nil {
+			return err
+		}
 	}
 
 	return flagSet.Parse(args)
@@ -92,7 +102,7 @@ func filterArgs(args []string) []string {
 	r := []string{}
 	for i := 0; i < len(args); i++ {
 		if strings.Index(args[i], "test.") >= 0 {
-			if i + 1 < len(args) && strings.Index(args[i + 1], "-") == -1 {
+			if i+1 < len(args) && strings.Index(args[i+1], "-") == -1 {
 				i++
 			}
 			i++
@@ -106,7 +116,7 @@ func filterArgs(args []string) []string {
 // processField generates a flag based on the given field and fieldName. If a
 // nested struct is detected, a flag for each field of that nested struct is
 // generated too.
-func (f *FlagLoader) processField(fieldName string, field *structs.Field) error {
+func (f *FlagLoader) processField(fieldName string, field *structs.Field, nestedLevel int) error {
 	if f.CamelCase {
 		fieldName = strings.Join(camelcase.Split(fieldName), "-")
 		fieldName = strings.Replace(fieldName, "---", "-", -1)
@@ -115,9 +125,9 @@ func (f *FlagLoader) processField(fieldName string, field *structs.Field) error 
 	switch field.Kind() {
 	case reflect.Struct:
 		for _, ff := range field.Fields() {
-			flagName := field.Name() + "-" + ff.Name()
+			flagName := fieldName + "-" + ff.Name()
 
-			if f.Flatten {
+			if f.Flatten && nestedLevel == 0 {
 				// first check if it's set or not, because if we have duplicate
 				// we don't want to break the flag. Panic by giving a readable
 				// output
@@ -131,7 +141,7 @@ func (f *FlagLoader) processField(fieldName string, field *structs.Field) error 
 				flagName = ff.Name()
 			}
 
-			if err := f.processField(flagName, ff); err != nil {
+			if err := f.processField(flagName, ff, nestedLevel+1); err != nil {
 				return err
 			}
 		}

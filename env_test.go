@@ -90,11 +90,13 @@ func setEnvVars(t *testing.T, structName, prefix string) {
 			"INTERVAL":                   "10s",
 			"ID":                         "1234567890",
 			"LABELS":                     "123,456",
+			"LOG_FILE":                   "/var/log/global.log",
 			"POSTGRES_ENABLED":           "true",
 			"POSTGRES_PORT":              "5432",
 			"POSTGRES_HOSTS":             "192.168.2.1,192.168.2.2,192.168.2.3",
 			"POSTGRES_DBNAME":            "configdb",
 			"POSTGRES_AVAILABILITYRATIO": "8.23",
+			"POSTGRES_LOG_FILE":          "/var/log/postgres.log",
 			"POSTGRES_FOO":               "8.23,9.12,11,90",
 		}
 	case "CamelCaseServer":
@@ -112,6 +114,7 @@ func setEnvVars(t *testing.T, structName, prefix string) {
 			"HOSTS":             "192.168.2.1,192.168.2.2,192.168.2.3",
 			"DBNAME":            "configdb",
 			"AVAILABILITYRATIO": "8.23",
+			"LOG_FILE":          "/var/log/postgres.log",
 			"FOO":               "8.23,9.12,11,90",
 		}
 	}
