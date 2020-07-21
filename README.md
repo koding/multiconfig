@@ -26,7 +26,7 @@ go get github.com/koding/multiconfig
 
 ## Usage and Examples
 
-Lets define and struct that defines our configuration
+Lets define a struct that describes our configuration
 
 ```go
 type Server struct {
