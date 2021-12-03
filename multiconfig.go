@@ -218,7 +218,42 @@ func fieldSet(field *structs.Field, v string) error {
 			return fmt.Errorf("multiconfig: field '%s' of type int64 is unsupported: %s (%T)",
 				field.Name(), field.Kind(), t)
 		}
+	case reflect.Uint:
+		u, err := strconv.ParseUint(v, 10, 0)
+		if err != nil {
+			return err
+		}
 
+		if err := field.Set(uint(u)); err != nil {
+			return err
+		}
+	case reflect.Uint16:
+		u, err := strconv.ParseUint(v, 10, 16)
+		if err != nil {
+			return err
+		}
+
+		if err := field.Set(uint16(u)); err != nil {
+			return err
+		}
+	case reflect.Uint32:
+		u, err := strconv.ParseUint(v, 10, 32)
+		if err != nil {
+			return err
+		}
+
+		if err := field.Set(uint32(u)); err != nil {
+			return err
+		}
+	case reflect.Uint64:
+		u, err := strconv.ParseUint(v, 10, 64)
+		if err != nil {
+			return err
+		}
+
+		if err := field.Set(u); err != nil {
+			return err
+		}
 	default:
 		return fmt.Errorf("multiconfig: field '%s' has unsupported type: %s", field.Name(), field.Kind())
 	}
