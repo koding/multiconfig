@@ -206,6 +206,9 @@ func getFlags(t *testing.T, structName, prefix string) []string {
 			"-postgres-hosts":             "192.168.2.1,192.168.2.2,192.168.2.3",
 			"-postgres-dbname":            "configdb",
 			"-postgres-availabilityratio": "8.23",
+			"-epoch":                      "1638551008",
+			"-epoch32":                    "1638551009",
+			"-epoch64":                    "1638551010",
 		}
 	case "FlattenedServer":
 		flags = map[string]string{

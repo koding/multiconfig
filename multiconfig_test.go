@@ -16,12 +16,15 @@ type (
 		Postgres   Postgres
 		unexported string
 		Interval   time.Duration
+		Epoch      uint   `default:"1638551008"`
+		Epoch32    uint32 `default:"1638551009"`
+		Epoch64    uint64 `default:"1638551010"`
 	}
 
 	// Postgres holds Postgresql database related configuration
 	Postgres struct {
 		Enabled           bool
-		Port              int      `required:"true" customRequired:"yes"`
+		Port              uint16   `required:"true" customRequired:"yes"`
 		Hosts             []string `required:"true"`
 		DBName            string   `default:"configdb"`
 		AvailabilityRatio float64
@@ -67,6 +70,9 @@ func getDefaultServer() *Server {
 			DBName:            "configdb",
 			AvailabilityRatio: 8.23,
 		},
+		Epoch:   1638551008,
+		Epoch32: 1638551009,
+		Epoch64: 1638551010,
 	}
 }
 
@@ -155,6 +161,18 @@ func testStruct(t *testing.T, s *Server, d *Server) {
 	}
 
 	testPostgres(t, s.Postgres, d.Postgres)
+
+	if s.Epoch != d.Epoch {
+		t.Errorf("Epoch value is wrong: %v, want: %v", s.Epoch, d.Epoch)
+	}
+
+	if s.Epoch32 != d.Epoch32 {
+		t.Errorf("Epoch32 value is wrong: %v, want: %v", s.Epoch32, d.Epoch32)
+	}
+
+	if s.Epoch64 != d.Epoch64 {
+		t.Errorf("Epoch64 value is wrong: %v, want: %v", s.Epoch64, d.Epoch64)
+	}
 }
 
 func testFlattenedStruct(t *testing.T, s *FlattenedServer, d *Server) {
