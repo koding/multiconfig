@@ -16,9 +16,9 @@ type (
 		Postgres   Postgres
 		unexported string
 		Interval   time.Duration
-		Epoch      uint
-		Epoch32    uint32
-		Epoch64    uint64
+		Epoch      uint   `default:"1638551008"`
+		Epoch32    uint32 `default:"1638551009"`
+		Epoch64    uint64 `default:"1638551010"`
 	}
 
 	// Postgres holds Postgresql database related configuration

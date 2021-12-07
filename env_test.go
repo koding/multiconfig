@@ -96,6 +96,9 @@ func setEnvVars(t *testing.T, structName, prefix string) {
 			"POSTGRES_DBNAME":            "configdb",
 			"POSTGRES_AVAILABILITYRATIO": "8.23",
 			"POSTGRES_FOO":               "8.23,9.12,11,90",
+			"EPOCH":                      "1638551008",
+			"EPOCH32":                    "1638551009",
+			"EPOCH64":                    "1638551010",
 		}
 	case "CamelCaseServer":
 		env = map[string]string{
