@@ -201,6 +201,7 @@ func TestCustomUsageTag(t *testing.T) {
 
 // getFlags returns a slice of arguments that can be passed to flag.Parse()
 func getFlags(t *testing.T, structName, prefix string) []string {
+	t.Helper()
 	if structName == "" {
 		t.Fatal("struct name can not be empty")
 	}

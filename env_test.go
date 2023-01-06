@@ -75,6 +75,7 @@ func TestENVFlattenStructPrefix(t *testing.T) {
 }
 
 func setEnvVars(t *testing.T, structName, prefix string) {
+	t.Helper()
 	if structName == "" {
 		t.Fatal("struct name can not be empty")
 	}

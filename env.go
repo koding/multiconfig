@@ -55,9 +55,9 @@ func (e *EnvironmentLoader) Load(s interface{}) error {
 func (e *EnvironmentLoader) processField(prefix string, field *structs.Field, name string, strctMap interface{}) error {
 	fieldName := e.generateFieldName(prefix, name)
 
-	switch strctMap.(type) {
+	switch smap := strctMap.(type) {
 	case map[string]interface{}:
-		for key, val := range strctMap.(map[string]interface{}) {
+		for key, val := range smap {
 			field := field.Field(key)
 
 			if err := e.processField(fieldName, field, key, val); err != nil {
@@ -100,9 +100,8 @@ func (e *EnvironmentLoader) PrintEnvs(s interface{}) {
 func (e *EnvironmentLoader) printField(prefix string, field *structs.Field, name string, strctMap interface{}) {
 	fieldName := e.generateFieldName(prefix, name)
 
-	switch strctMap.(type) {
+	switch smap := strctMap.(type) {
 	case map[string]interface{}:
-		smap := strctMap.(map[string]interface{})
 		keys := make([]string, 0, len(smap))
 		for key := range smap {
 			keys = append(keys, key)

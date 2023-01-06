@@ -26,7 +26,7 @@ func (t *TagLoader) Load(s interface{}) error {
 
 	for _, field := range structs.Fields(s) {
 
-		if err := t.processField(t.DefaultTagName, field); err != nil {
+		if err := processField(t.DefaultTagName, field); err != nil {
 			return err
 		}
 	}
@@ -36,16 +36,16 @@ func (t *TagLoader) Load(s interface{}) error {
 
 // processField gets tagName and the field, recursively checks if the field has the given
 // tag, if yes, sets it otherwise ignores
-func (t *TagLoader) processField(tagName string, field *structs.Field) error {
+func processField(tagName string, field *structs.Field) error {
 	switch field.Kind() {
 	case reflect.Struct:
 		for _, f := range field.Fields() {
-			if err := t.processField(tagName, f); err != nil {
+			if err := processField(tagName, f); err != nil {
 				return err
 			}
 		}
 	default:
-		defaultVal := field.Tag(t.DefaultTagName)
+		defaultVal := field.Tag(tagName)
 		if defaultVal == "" {
 			return nil
 		}

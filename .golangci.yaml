@@ -1,0 +1,31 @@
+linters:
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - typecheck
+    - unused
+    - bodyclose
+    - durationcheck
+    - makezero 
+    - nilerr
+    - noctx
+    - nosprintfhostport
+    - rowserrcheck
+    - sqlclosecheck
+    - tenv
+    - thelper
+    - wastedassign
+    - promlinter
+    - unconvert
+    - unparam
+# Style
+    - errname
+    - gofmt 
+    - goimports
+    - goprintffuncname
+    - grouper 
+# Spelling
+    - misspell

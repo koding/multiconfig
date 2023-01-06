@@ -1,9 +1,10 @@
 package multiconfig
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 type (
@@ -79,10 +80,12 @@ func getDefaultServer() *Server {
 			Hosts:             []string{"192.168.2.1", "192.168.2.2", "192.168.2.3"},
 			DBName:            "configdb",
 			AvailabilityRatio: 8.23,
+			unexported:        "unexported",
 		},
-		Epoch:   1638551008,
-		Epoch32: 1638551009,
-		Epoch64: 1638551010,
+		Epoch:      1638551008,
+		Epoch32:    1638551009,
+		Epoch64:    1638551010,
+		unexported: "unexported",
 	}
 }
 
@@ -145,6 +148,8 @@ func TestDefaultLoader(t *testing.T) {
 }
 
 func testStruct(t *testing.T, s *Server, d *Server) {
+	t.Helper()
+
 	if s.Name != d.Name {
 		t.Errorf("Name value is wrong: %s, want: %s", s.Name, d.Name)
 	}
@@ -201,12 +206,16 @@ func testStruct(t *testing.T, s *Server, d *Server) {
 }
 
 func testFlattenedStruct(t *testing.T, s *FlattenedServer, d *Server) {
+	t.Helper()
+
 	// Explicitly state that Enabled should be true, no need to check
 	// `x == true` infact.
 	testPostgres(t, s.Postgres, d.Postgres)
 }
 
 func testPostgres(t *testing.T, s Postgres, d Postgres) {
+	t.Helper()
+
 	if s.Enabled != d.Enabled {
 		t.Errorf("Postgres enabled is wrong %t, want: %t", s.Enabled, d.Enabled)
 	}
@@ -236,6 +245,8 @@ func testPostgres(t *testing.T, s Postgres, d Postgres) {
 }
 
 func testCamelcaseStruct(t *testing.T, s *CamelCaseServer, d *CamelCaseServer) {
+	t.Helper()
+
 	if s.AccessKey != d.AccessKey {
 		t.Errorf("AccessKey is wrong: %s, want: %s", s.AccessKey, d.AccessKey)
 	}
@@ -255,6 +266,8 @@ func testCamelcaseStruct(t *testing.T, s *CamelCaseServer, d *CamelCaseServer) {
 }
 
 func testNestedStruct(t *testing.T, s *NestedServer, d *NestedServer) {
+	t.Helper()
+
 	require.Equal(t, s.Name, d.Name)
 	require.NotNil(t, d.Database)
 	require.NotNil(t, s.Database)
