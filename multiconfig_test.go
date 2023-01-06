@@ -1,6 +1,7 @@
 package multiconfig
 
 import (
+	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
 )
@@ -34,6 +35,15 @@ type (
 	TaggedServer struct {
 		Name     string `required:"true"`
 		Postgres `structs:",flatten"`
+	}
+
+	Database struct {
+		Postgres Postgres
+	}
+
+	NestedServer struct {
+		Name     string `required:"true"`
+		Database Database
 	}
 )
 
@@ -82,6 +92,21 @@ func getDefaultCamelCaseServer() *CamelCaseServer {
 		Normal:            "normal",
 		DBName:            "configdb",
 		AvailabilityRatio: 8.23,
+	}
+}
+
+func getDefaultNestedServer() *NestedServer {
+	return &NestedServer{
+		Name: "koding",
+		Database: Database{
+			Postgres: Postgres{
+				Enabled:           true,
+				Port:              5432,
+				Hosts:             []string{"192.168.2.1", "192.168.2.2", "192.168.2.3"},
+				DBName:            "configdb",
+				AvailabilityRatio: 8.23,
+			},
+		},
 	}
 }
 
@@ -227,4 +252,12 @@ func testCamelcaseStruct(t *testing.T, s *CamelCaseServer, d *CamelCaseServer) {
 		t.Errorf("AvailabilityRatio is wrong: %f, want: %f", s.AvailabilityRatio, d.AvailabilityRatio)
 	}
 
+}
+
+func testNestedStruct(t *testing.T, s *NestedServer, d *NestedServer) {
+	require.Equal(t, s.Name, d.Name)
+	require.NotNil(t, d.Database)
+	require.NotNil(t, s.Database)
+
+	testPostgres(t, s.Database.Postgres, d.Database.Postgres)
 }

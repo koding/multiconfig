@@ -45,6 +45,21 @@ func TestFlagWithPrefix(t *testing.T) {
 	testStruct(t, s, getDefaultServer())
 }
 
+func TestNestedFlags(t *testing.T) {
+	m := FlagLoader{}
+	s := &NestedServer{}
+	structName := structs.Name(s)
+
+	args := getFlags(t, structName, "")
+	m.Args = args[1:]
+
+	if err := m.Load(s); err != nil {
+		t.Error(err)
+	}
+
+	testNestedStruct(t, s, getDefaultNestedServer())
+}
+
 func TestFlattenFlags(t *testing.T) {
 	m := FlagLoader{
 		Flatten: true,
@@ -232,6 +247,15 @@ func getFlags(t *testing.T, structName, prefix string) []string {
 			"--normal":             "normal",
 			"--db-name":            "configdb",
 			"--availability-ratio": "8.23",
+		}
+	case "NestedServer":
+		flags = map[string]string{
+			"--name":                                "koding",
+			"--database-postgres-enabled":           "",
+			"--database-postgres-port":              "5432",
+			"--database-postgres-hosts":             "192.168.2.1,192.168.2.2,192.168.2.3",
+			"--database-postgres-dbname":            "configdb",
+			"--database-postgres-availabilityratio": "8.23",
 		}
 	}
 
